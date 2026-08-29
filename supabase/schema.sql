@@ -15,6 +15,8 @@ create table if not exists products (
   original_price numeric(10,2) not null,
   price numeric(10,2) not null,
   discount numeric(5,2) not null default 0,
+  description text,
+  features text[] not null default '{}',
   created_at timestamptz not null default now()
 );
 

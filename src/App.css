@@ -562,7 +562,9 @@
   border-radius: var(--raio);
   padding: 32px 28px;
   width: 100%;
-  max-width: 340px;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -574,6 +576,34 @@
   font-size: 14px;
   color: var(--texto-suave);
   margin: 4px 0;
+}
+
+.detalhe-bloco {
+  width: 100%;
+  text-align: left;
+}
+
+.detalhe-bloco h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--titulo);
+  margin-bottom: 6px;
+}
+
+.detalhe-texto-livre {
+  font-size: 14px;
+  color: var(--texto);
+  white-space: pre-line;
+}
+
+.detalhe-lista {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--texto);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .formulario {
@@ -614,12 +644,54 @@
 .formulario input[type='email'],
 .formulario input[type='password'],
 .formulario input:not([type]),
-.formulario select {
+.formulario select,
+.formulario textarea {
   padding: 9px 12px;
   border: 1px solid var(--borda);
   border-radius: var(--raio-sm);
   font-size: 14px;
   font-family: inherit;
+  resize: vertical;
+}
+
+.lista-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lista-itens-linha {
+  display: flex;
+  gap: 8px;
+}
+
+.lista-itens-linha input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  font-size: 14px;
+}
+
+.lista-itens-linha button {
+  width: 32px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  background: #fff;
+  color: #dc2626;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.botao-add-item {
+  align-self: flex-start;
+  border: 1px dashed var(--borda);
+  background: none;
+  color: var(--azul);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--raio-sm);
 }
 
 .campo-senha {

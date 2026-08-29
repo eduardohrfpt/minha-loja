@@ -13,6 +13,8 @@ const formVazio = {
   duration: '',
   original_price: '',
   discount: '',
+  description: '',
+  features: [],
 }
 
 function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
@@ -42,8 +44,26 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       duration: produto.duration || '',
       original_price: produto.original_price,
       discount: produto.discount,
+      description: produto.description || '',
+      features: produto.features || [],
     })
     setProdutoEditando(produto.id)
+  }
+
+  function adicionarItemFeature() {
+    setForm((f) => ({ ...f, features: [...f.features, ''] }))
+  }
+
+  function atualizarItemFeature(indice, valor) {
+    setForm((f) => {
+      const novas = [...f.features]
+      novas[indice] = valor
+      return { ...f, features: novas }
+    })
+  }
+
+  function removerItemFeature(indice) {
+    setForm((f) => ({ ...f, features: f.features.filter((_, i) => i !== indice) }))
   }
 
   async function salvarProduto(e) {
@@ -70,6 +90,8 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       original_price: originalPrice,
       price: originalPrice - (originalPrice * discount) / 100,
       discount,
+      description: form.description,
+      features: form.features.map((item) => item.trim()).filter(Boolean),
     }
 
     setSalvando(true)
@@ -197,6 +219,25 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
               <i />
               {produtoDetalhe.available ? 'Em estoque' : 'Indisponível'}
             </span>
+
+            {produtoDetalhe.description && (
+              <div className="detalhe-bloco">
+                <h4>Descrição completa</h4>
+                <p className="detalhe-texto-livre">{produtoDetalhe.description}</p>
+              </div>
+            )}
+
+            {produtoDetalhe.features?.length > 0 && (
+              <div className="detalhe-bloco">
+                <h4>O que está incluso</h4>
+                <ul className="detalhe-lista">
+                  {produtoDetalhe.features.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <span className="preco-final">{formatarPreco(produtoDetalhe.price)}</span>
             <div className="acoes-formulario">
               <button onClick={() => setProdutoDetalhe(null)}>Fechar</button>
@@ -268,6 +309,35 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
                 onChange={(e) => setForm({ ...form, available: e.target.checked })}
               />
               Disponível em estoque
+            </label>
+            <label>
+              Descrição completa
+              <textarea
+                rows={4}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Escreva os detalhes do produto, pode usar vários parágrafos."
+              />
+            </label>
+            <label>
+              O que está incluso
+              <div className="lista-itens">
+                {form.features.map((item, indice) => (
+                  <div className="lista-itens-linha" key={indice}>
+                    <input
+                      value={item}
+                      onChange={(e) => atualizarItemFeature(indice, e.target.value)}
+                      placeholder="Ex: Suporte via WhatsApp"
+                    />
+                    <button type="button" onClick={() => removerItemFeature(indice)} aria-label="Remover item">
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button type="button" className="botao-add-item" onClick={adicionarItemFeature}>
+                  + Adicionar item
+                </button>
+              </div>
             </label>
 
             <div className="acoes-formulario">
