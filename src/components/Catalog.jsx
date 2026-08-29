@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
+import { useAuth } from '../context/AuthContext'
 
 const formVazio = {
   name: '',
@@ -15,17 +16,22 @@ const formVazio = {
 }
 
 function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
+  const { isAdmin } = useAuth()
+  const adminAtivo = modoAdmin && isAdmin
+
   const [produtoEditando, setProdutoEditando] = useState(null)
   const [form, setForm] = useState(formVazio)
   const [produtoDetalhe, setProdutoDetalhe] = useState(null)
   const [salvando, setSalvando] = useState(false)
 
   function abrirFormularioNovo() {
+    if (!adminAtivo) return
     setForm(formVazio)
     setProdutoEditando('novo')
   }
 
   function abrirFormularioEdicao(produto) {
+    if (!adminAtivo) return
     setForm({
       name: produto.name,
       brand: produto.brand,
@@ -42,6 +48,7 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
 
   async function salvarProduto(e) {
     e.preventDefault()
+    if (!adminAtivo) return
     const originalPrice = parseFloat(form.original_price)
     const discount = parseFloat(form.discount) || 0
 
@@ -82,6 +89,7 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
   }
 
   async function removerProduto(id) {
+    if (!adminAtivo) return
     if (!confirm('Tem certeza que deseja remover este produto?')) return
 
     const { error } = await supabase.from('products').delete().eq('id', id)
@@ -103,7 +111,7 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
         <p>Todas as assinaturas disponíveis, com desconto já aplicado.</p>
       </div>
 
-      {modoAdmin && (
+      {adminAtivo && (
         <div className="painel-admin">
           <button className="botao-novo" onClick={abrirFormularioNovo}>
             + Novo produto
@@ -161,7 +169,7 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
               </button>
             </div>
 
-            {modoAdmin && (
+            {adminAtivo && (
               <div className="acoes-admin">
                 <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
                 <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
