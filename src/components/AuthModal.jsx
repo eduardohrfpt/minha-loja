@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
 import { IconEye, IconEyeOff } from './icons'
+import { rolarPara } from '../utils'
 
 function AuthModal({ modoInicial, onFechar }) {
   const { entrar, cadastrar } = useAuth()
@@ -31,6 +32,7 @@ function AuthModal({ modoInicial, onFechar }) {
       alert('Conta criada! Se for solicitada confirmação por e-mail, verifique sua caixa de entrada antes de entrar.')
     }
     onFechar()
+    rolarPara('produtos')
   }
 
   return createPortal(
