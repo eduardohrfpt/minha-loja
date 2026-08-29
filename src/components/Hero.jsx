@@ -5,10 +5,10 @@ function Hero({ produtosDestaque }) {
     <section id="topo" className="hero">
       <div className="hero-texto">
         <span className="etiqueta-eyebrow">Licenças originais, direto da fonte</span>
-        <h1>Assinaturas premium, preço justo.</h1>
+        <h1>Assinaturas premium por um preço muito mais baixo. Até 90% mais barato, aproveite!</h1>
         <p className="hero-subtitulo">
-          Compramos licenças no atacado de ChatGPT, Notion, Spotify e outros apps que você já usa —
-          e repassamos o desconto direto pra você, sem letra miúda.
+          Negociamos condições especiais com fornecedores autorizados para garantir os melhores
+          preços. O produto é 100% original — a única diferença é que aqui você paga muito menos.
         </p>
         <div className="hero-acoes">
           <button className="botao-primario botao-grande" onClick={() => rolarPara('produtos')}>
