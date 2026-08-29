@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
 
 function AuthModal({ modoInicial, onFechar }) {
@@ -30,7 +31,7 @@ function AuthModal({ modoInicial, onFechar }) {
     onFechar()
   }
 
-  return (
+  return createPortal(
     <div className="overlay" onClick={onFechar}>
       <form className="formulario" onClick={(e) => e.stopPropagation()} onSubmit={enviar}>
         <h2>{modo === 'login' ? 'Entrar' : 'Criar conta'}</h2>
@@ -75,7 +76,8 @@ function AuthModal({ modoInicial, onFechar }) {
           {modo === 'login' ? 'Não tem conta? Criar conta' : 'Já tem conta? Entrar'}
         </button>
       </form>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
