@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
+import { IconEye, IconEyeOff } from './icons'
 
 function AuthModal({ modoInicial, onFechar }) {
   const { entrar, cadastrar } = useAuth()
@@ -10,6 +11,7 @@ function AuthModal({ modoInicial, onFechar }) {
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [mostrarSenha, setMostrarSenha] = useState(false)
 
   async function enviar(e) {
     e.preventDefault()
@@ -48,13 +50,23 @@ function AuthModal({ modoInicial, onFechar }) {
         </label>
         <label>
           Senha
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            minLength={6}
-          />
+          <div className="campo-senha">
+            <input
+              type={mostrarSenha ? 'text' : 'password'}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              minLength={6}
+            />
+            <button
+              type="button"
+              className="botao-olho"
+              onClick={() => setMostrarSenha((v) => !v)}
+              aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {mostrarSenha ? <IconEyeOff /> : <IconEye />}
+            </button>
+          </div>
         </label>
 
         {erro && <p className="erro-form">{erro}</p>}

@@ -622,6 +622,38 @@
   font-family: inherit;
 }
 
+.campo-senha {
+  position: relative;
+  display: flex;
+}
+
+.campo-senha input {
+  width: 100%;
+  padding-right: 40px !important;
+}
+
+.botao-olho {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: none;
+  color: var(--texto-suave);
+  padding: 0;
+}
+.botao-olho svg {
+  width: 18px;
+  height: 18px;
+}
+.botao-olho:hover {
+  color: var(--azul);
+}
+
 .erro-form {
   color: #dc2626;
   font-size: 13px;
