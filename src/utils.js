@@ -3,9 +3,5 @@ export function rolarPara(id) {
 }
 
 export function formatarPreco(valor) {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-export function precoComDesconto(preco, desconto) {
-  return preco - (preco * desconto) / 100
+  return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }

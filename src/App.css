@@ -401,10 +401,18 @@
   transform: translateY(-2px);
 }
 
-.selo {
+.selos {
   position: absolute;
   top: 14px;
   right: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: 65%;
+}
+
+.selo {
   background: var(--verde);
   color: #fff;
   font-size: 11px;
@@ -603,11 +611,37 @@
 
 .formulario input[type='text'],
 .formulario input[type='number'],
-.formulario input:not([type]) {
+.formulario input[type='email'],
+.formulario input[type='password'],
+.formulario input:not([type]),
+.formulario select {
   padding: 9px 12px;
   border: 1px solid var(--borda);
   border-radius: var(--raio-sm);
   font-size: 14px;
+  font-family: inherit;
+}
+
+.erro-form {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0;
+}
+
+.link-alternar {
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--azul);
+  font-size: 13px;
+  text-decoration: underline;
+  margin-top: 4px;
+}
+
+.usuario-logado {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul);
 }
 
 .acoes-formulario {

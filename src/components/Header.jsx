@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { rolarPara } from '../utils'
+import { useAuth } from '../context/AuthContext'
+import AuthModal from './AuthModal'
 
 const linksNav = [
   { id: 'produtos', label: 'Produtos' },
@@ -6,11 +9,10 @@ const linksNav = [
   { id: 'vantagens', label: 'Vantagens' },
 ]
 
-function avisoEmBreve() {
-  alert('Sistema de contas em desenvolvimento 🚧')
-}
-
 function Header() {
+  const { usuario, sair } = useAuth()
+  const [modalAberto, setModalAberto] = useState(null)
+
   return (
     <header className="cabecalho">
       <div className="cabecalho-conteudo">
@@ -28,14 +30,27 @@ function Header() {
         </nav>
 
         <div className="cabecalho-acoes">
-          <button className="botao-fantasma" onClick={avisoEmBreve}>
-            Entrar
-          </button>
-          <button className="botao-primario" onClick={avisoEmBreve}>
-            Criar conta
-          </button>
+          {usuario ? (
+            <>
+              <span className="usuario-logado">{usuario.user_metadata?.nome || usuario.email}</span>
+              <button className="botao-fantasma" onClick={sair}>
+                Sair
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="botao-fantasma" onClick={() => setModalAberto('login')}>
+                Entrar
+              </button>
+              <button className="botao-primario" onClick={() => setModalAberto('cadastro')}>
+                Criar conta
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {modalAberto && <AuthModal modoInicial={modalAberto} onFechar={() => setModalAberto(null)} />}
     </header>
   )
 }

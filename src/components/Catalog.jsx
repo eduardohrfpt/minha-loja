@@ -1,21 +1,24 @@
 import { useState } from 'react'
-import { formatarPreco, precoComDesconto } from '../utils'
+import { supabase } from '../lib/supabaseClient'
+import { formatarPreco } from '../utils'
 
 const formVazio = {
-  nome: '',
-  marca: '',
-  preco: '',
-  desconto: '',
-  imagem: '✨',
-  selo: '',
-  disponivel: true,
-  descricao: '',
+  name: '',
+  brand: '',
+  image: '✨',
+  badges: '',
+  available: true,
+  delivery_type: 'imediata',
+  duration: '',
+  original_price: '',
+  discount: '',
 }
 
-function Catalog({ produtos, setProdutos, modoAdmin }) {
+function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
   const [produtoEditando, setProdutoEditando] = useState(null)
   const [form, setForm] = useState(formVazio)
   const [produtoDetalhe, setProdutoDetalhe] = useState(null)
+  const [salvando, setSalvando] = useState(false)
 
   function abrirFormularioNovo() {
     setForm(formVazio)
@@ -24,58 +27,73 @@ function Catalog({ produtos, setProdutos, modoAdmin }) {
 
   function abrirFormularioEdicao(produto) {
     setForm({
-      nome: produto.nome,
-      marca: produto.marca,
-      preco: produto.preco,
-      desconto: produto.desconto,
-      imagem: produto.imagem,
-      selo: produto.selo || '',
-      disponivel: produto.disponivel,
-      descricao: produto.descricao || '',
+      name: produto.name,
+      brand: produto.brand,
+      image: produto.image,
+      badges: (produto.badges || []).join(', '),
+      available: produto.available,
+      delivery_type: produto.delivery_type,
+      duration: produto.duration || '',
+      original_price: produto.original_price,
+      discount: produto.discount,
     })
     setProdutoEditando(produto.id)
   }
 
-  function salvarProduto(e) {
+  async function salvarProduto(e) {
     e.preventDefault()
-    const preco = parseFloat(form.preco)
-    const desconto = parseFloat(form.desconto) || 0
+    const originalPrice = parseFloat(form.original_price)
+    const discount = parseFloat(form.discount) || 0
 
-    if (!form.nome || !form.marca || Number.isNaN(preco)) {
+    if (!form.name || !form.brand || Number.isNaN(originalPrice)) {
       alert('Preencha nome, marca e um preço válido.')
       return
     }
 
     const dadosProduto = {
-      nome: form.nome,
-      marca: form.marca,
-      preco,
-      desconto,
-      imagem: form.imagem || '🛒',
-      selo: form.selo,
-      disponivel: form.disponivel,
-      descricao: form.descricao,
+      name: form.name,
+      brand: form.brand,
+      image: form.image || '🛒',
+      badges: form.badges
+        ? form.badges.split(',').map((b) => b.trim()).filter(Boolean)
+        : [],
+      available: form.available,
+      delivery_type: form.delivery_type,
+      duration: form.duration,
+      original_price: originalPrice,
+      price: originalPrice - (originalPrice * discount) / 100,
+      discount,
     }
 
-    if (produtoEditando === 'novo') {
-      setProdutos((prev) => [...prev, { id: Date.now(), ...dadosProduto }])
-    } else {
-      setProdutos((prev) =>
-        prev.map((p) => (p.id === produtoEditando ? { ...p, ...dadosProduto } : p)),
-      )
+    setSalvando(true)
+    const { error } =
+      produtoEditando === 'novo'
+        ? await supabase.from('products').insert([dadosProduto])
+        : await supabase.from('products').update(dadosProduto).eq('id', produtoEditando)
+    setSalvando(false)
+
+    if (error) {
+      alert(`Erro ao salvar produto: ${error.message}`)
+      return
     }
+
     setProdutoEditando(null)
+    recarregarProdutos()
   }
 
-  function removerProduto(id) {
-    if (confirm('Tem certeza que deseja remover este produto?')) {
-      setProdutos((prev) => prev.filter((p) => p.id !== id))
+  async function removerProduto(id) {
+    if (!confirm('Tem certeza que deseja remover este produto?')) return
+
+    const { error } = await supabase.from('products').delete().eq('id', id)
+    if (error) {
+      alert(`Erro ao remover produto: ${error.message}`)
+      return
     }
+    recarregarProdutos()
   }
 
   function comprar(produto) {
-    const precoFinal = formatarPreco(precoComDesconto(produto.preco, produto.desconto))
-    alert(`Compra simulada: ${produto.nome} por ${precoFinal}`)
+    alert(`Compra simulada: ${produto.name} por ${formatarPreco(produto.price)}`)
   }
 
   return (
@@ -94,58 +112,65 @@ function Catalog({ produtos, setProdutos, modoAdmin }) {
       )}
 
       <div className="grade">
-        {produtos.map((produto) => {
-          const precoFinal = precoComDesconto(produto.preco, produto.desconto)
-          return (
-            <div className="card" key={produto.id}>
-              {produto.selo && <span className="selo">{produto.selo}</span>}
-              <div className="card-topo">
-                <span className="icone-marca">{produto.imagem}</span>
-                <div>
-                  <h3>{produto.nome}</h3>
-                  <span className="card-marca">{produto.marca}</span>
-                </div>
+        {produtos.map((produto) => (
+          <div className="card" key={produto.id}>
+            {produto.badges?.length > 0 && (
+              <div className="selos">
+                {produto.badges.map((badge) => (
+                  <span className="selo" key={badge}>
+                    {badge}
+                  </span>
+                ))}
               </div>
-
-              <span className={`disponibilidade ${produto.disponivel ? 'ok' : 'indisponivel'}`}>
-                <i />
-                {produto.disponivel ? 'Em estoque' : 'Indisponível'}
-              </span>
-
-              <div className="precos">
-                <div className="precos-linha">
-                  {produto.desconto > 0 && (
-                    <span className="preco-antigo">{formatarPreco(produto.preco)}</span>
-                  )}
-                  {produto.desconto > 0 && <span className="etiqueta-desconto">-{produto.desconto}%</span>}
-                </div>
-                <span className="preco-final">{formatarPreco(precoFinal)}</span>
+            )}
+            <div className="card-topo">
+              <span className="icone-marca">{produto.image}</span>
+              <div>
+                <h3>{produto.name}</h3>
+                <span className="card-marca">{produto.brand}</span>
               </div>
-
-              <div className="card-acoes">
-                <button className="botao-secundario" onClick={() => setProdutoDetalhe(produto)}>
-                  Detalhes
-                </button>
-                <button
-                  className="botao-primario"
-                  disabled={!produto.disponivel}
-                  onClick={() => comprar(produto)}
-                >
-                  Comprar
-                </button>
-              </div>
-
-              {modoAdmin && (
-                <div className="acoes-admin">
-                  <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
-                  <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
-                    Remover
-                  </button>
-                </div>
-              )}
             </div>
-          )
-        })}
+
+            <span className={`disponibilidade ${produto.available ? 'ok' : 'indisponivel'}`}>
+              <i />
+              {produto.available ? 'Em estoque' : 'Indisponível'}
+            </span>
+
+            <div className="precos">
+              <div className="precos-linha">
+                {produto.discount > 0 && (
+                  <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                )}
+                {produto.discount > 0 && (
+                  <span className="etiqueta-desconto">-{produto.discount}%</span>
+                )}
+              </div>
+              <span className="preco-final">{formatarPreco(produto.price)}</span>
+            </div>
+
+            <div className="card-acoes">
+              <button className="botao-secundario" onClick={() => setProdutoDetalhe(produto)}>
+                Detalhes
+              </button>
+              <button
+                className="botao-primario"
+                disabled={!produto.available}
+                onClick={() => comprar(produto)}
+              >
+                Comprar
+              </button>
+            </div>
+
+            {modoAdmin && (
+              <div className="acoes-admin">
+                <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
+                <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
+                  Remover
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
 
         {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
       </div>
@@ -153,24 +178,23 @@ function Catalog({ produtos, setProdutos, modoAdmin }) {
       {produtoDetalhe && (
         <div className="overlay" onClick={() => setProdutoDetalhe(null)}>
           <div className="modal-detalhes" onClick={(e) => e.stopPropagation()}>
-            <span className="icone-marca icone-marca-grande">{produtoDetalhe.imagem}</span>
-            <h3>{produtoDetalhe.nome}</h3>
-            <span className="card-marca">{produtoDetalhe.marca}</span>
+            <span className="icone-marca icone-marca-grande">{produtoDetalhe.image}</span>
+            <h3>{produtoDetalhe.name}</h3>
+            <span className="card-marca">{produtoDetalhe.brand}</span>
             <p className="descricao-produto">
-              {produtoDetalhe.descricao || 'Assinatura oficial, ativação garantida após a confirmação da compra.'}
+              Duração: {produtoDetalhe.duration || 'não informada'} · Entrega:{' '}
+              {produtoDetalhe.delivery_type === 'imediata' ? 'imediata' : 'manual'}
             </p>
-            <span className={`disponibilidade ${produtoDetalhe.disponivel ? 'ok' : 'indisponivel'}`}>
+            <span className={`disponibilidade ${produtoDetalhe.available ? 'ok' : 'indisponivel'}`}>
               <i />
-              {produtoDetalhe.disponivel ? 'Em estoque' : 'Indisponível'}
+              {produtoDetalhe.available ? 'Em estoque' : 'Indisponível'}
             </span>
-            <span className="preco-final">
-              {formatarPreco(precoComDesconto(produtoDetalhe.preco, produtoDetalhe.desconto))}
-            </span>
+            <span className="preco-final">{formatarPreco(produtoDetalhe.price)}</span>
             <div className="acoes-formulario">
               <button onClick={() => setProdutoDetalhe(null)}>Fechar</button>
               <button
                 className="botao-primario"
-                disabled={!produtoDetalhe.disponivel}
+                disabled={!produtoDetalhe.available}
                 onClick={() => {
                   comprar(produtoDetalhe)
                   setProdutoDetalhe(null)
@@ -190,37 +214,50 @@ function Catalog({ produtos, setProdutos, modoAdmin }) {
 
             <label>
               Emoji/ícone
-              <input value={form.imagem} onChange={(e) => setForm({ ...form, imagem: e.target.value })} placeholder="🤖" />
+              <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="🤖" />
             </label>
             <label>
               Nome
-              <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} required />
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             </label>
             <label>
               Marca
-              <input value={form.marca} onChange={(e) => setForm({ ...form, marca: e.target.value })} required />
+              <input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} required />
             </label>
             <label>
-              Preço (R$)
-              <input type="number" step="0.01" value={form.preco} onChange={(e) => setForm({ ...form, preco: e.target.value })} required />
+              Preço original (R$)
+              <input
+                type="number"
+                step="0.01"
+                value={form.original_price}
+                onChange={(e) => setForm({ ...form, original_price: e.target.value })}
+                required
+              />
             </label>
             <label>
               Desconto (%)
-              <input type="number" step="1" value={form.desconto} onChange={(e) => setForm({ ...form, desconto: e.target.value })} />
+              <input type="number" step="1" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} />
             </label>
             <label>
-              Selo (opcional)
-              <input value={form.selo} onChange={(e) => setForm({ ...form, selo: e.target.value })} placeholder="Mais vendido" />
+              Duração
+              <input value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} placeholder="1 mês" />
             </label>
             <label>
-              Descrição
-              <input value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
+              Tipo de entrega
+              <select value={form.delivery_type} onChange={(e) => setForm({ ...form, delivery_type: e.target.value })}>
+                <option value="imediata">Imediata</option>
+                <option value="manual">Manual</option>
+              </select>
+            </label>
+            <label>
+              Selos (separados por vírgula)
+              <input value={form.badges} onChange={(e) => setForm({ ...form, badges: e.target.value })} placeholder="Mais vendido, Novo" />
             </label>
             <label className="checkbox">
               <input
                 type="checkbox"
-                checked={form.disponivel}
-                onChange={(e) => setForm({ ...form, disponivel: e.target.checked })}
+                checked={form.available}
+                onChange={(e) => setForm({ ...form, available: e.target.checked })}
               />
               Disponível em estoque
             </label>
@@ -229,8 +266,8 @@ function Catalog({ produtos, setProdutos, modoAdmin }) {
               <button type="button" onClick={() => setProdutoEditando(null)}>
                 Cancelar
               </button>
-              <button type="submit" className="botao-primario">
-                Salvar
+              <button type="submit" className="botao-primario" disabled={salvando}>
+                {salvando ? 'Salvando...' : 'Salvar'}
               </button>
             </div>
           </form>
