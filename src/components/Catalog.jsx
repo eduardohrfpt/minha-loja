@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailsModal from './ProductDetailsModal'
+import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 
 const formVazio = {
   name: '',
@@ -45,14 +46,16 @@ function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeho
   )
 }
 
-function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
-  const { isAdmin } = useAuth()
+function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
+  const { usuario, isAdmin } = useAuth()
   const adminAtivo = modoAdmin && isAdmin
 
   const [produtoEditando, setProdutoEditando] = useState(null)
   const [form, setForm] = useState(formVazio)
   const [produtoDetalhe, setProdutoDetalhe] = useState(null)
+  const [produtoEstoque, setProdutoEstoque] = useState(null)
   const [salvando, setSalvando] = useState(false)
+  const [comprando, setComprando] = useState(null)
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -162,8 +165,36 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
     recarregarProdutos()
   }
 
-  function comprar(produto) {
-    alert(`Compra simulada: ${produto.name} por ${formatarPreco(produto.price)}`)
+  async function simularCompra(produto) {
+    if (!usuario) {
+      alert('Você precisa entrar na sua conta para comprar. Clique em "Entrar" no topo da página.')
+      return
+    }
+
+    setComprando(produto.id)
+    const { data, error } = await supabase.rpc('resgatar_codigo', { p_product_id: produto.id })
+    setComprando(null)
+
+    if (error) {
+      alert(`Não foi possível concluir a compra: ${error.message}`)
+      return
+    }
+
+    const codigo = data?.[0]?.codigo
+    alert(`Compra confirmada! Seu código: ${codigo}`)
+
+    fetch('/api/send-order-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: usuario.email,
+        nome: usuario.user_metadata?.nome,
+        produtoNome: produto.name,
+        codigo,
+      }),
+    }).catch((err) => console.error('Falha ao enviar e-mail de confirmação:', err))
+
+    recarregarProdutos()
   }
 
   return (
@@ -182,65 +213,76 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       )}
 
       <div className="grade">
-        {produtos.map((produto) => (
-          <div className="card" key={produto.id}>
-            {produto.badges?.length > 0 && (
-              <div className="selos">
-                {produto.badges.map((badge) => (
-                  <span className="selo" key={badge}>
-                    {badge}
-                  </span>
-                ))}
+        {produtos.map((produto) => {
+          const qtdEstoque = estoque[produto.id] || 0
+          const semEstoque = qtdEstoque === 0
+          const disponivelReal = produto.available && !semEstoque
+          const statusTexto = semEstoque ? 'Esgotado' : produto.available ? 'Em estoque' : 'Indisponível'
+
+          return (
+            <div className="card" key={produto.id}>
+              {produto.badges?.length > 0 && (
+                <div className="selos">
+                  {produto.badges.map((badge) => (
+                    <span className="selo" key={badge}>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="card-topo">
+                <span className="icone-marca">{produto.image}</span>
+                <div>
+                  <h3>{produto.name}</h3>
+                  <span className="card-marca">{produto.brand}</span>
+                </div>
               </div>
-            )}
-            <div className="card-topo">
-              <span className="icone-marca">{produto.image}</span>
-              <div>
-                <h3>{produto.name}</h3>
-                <span className="card-marca">{produto.brand}</span>
+
+              <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
+                <i />
+                {statusTexto}
+              </span>
+
+              <div className="precos">
+                <div className="precos-linha">
+                  {produto.discount > 0 && (
+                    <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                  )}
+                  {produto.discount > 0 && (
+                    <span className="etiqueta-desconto">-{produto.discount}%</span>
+                  )}
+                </div>
+                <span className="preco-final">{formatarPreco(produto.price)}</span>
               </div>
-            </div>
 
-            <span className={`disponibilidade ${produto.available ? 'ok' : 'indisponivel'}`}>
-              <i />
-              {produto.available ? 'Em estoque' : 'Indisponível'}
-            </span>
-
-            <div className="precos">
-              <div className="precos-linha">
-                {produto.discount > 0 && (
-                  <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
-                )}
-                {produto.discount > 0 && (
-                  <span className="etiqueta-desconto">-{produto.discount}%</span>
-                )}
-              </div>
-              <span className="preco-final">{formatarPreco(produto.price)}</span>
-            </div>
-
-            <div className="card-acoes">
-              <button className="botao-secundario" onClick={() => setProdutoDetalhe(produto)}>
-                Detalhes
-              </button>
-              <button
-                className="botao-primario"
-                disabled={!produto.available}
-                onClick={() => comprar(produto)}
-              >
-                Comprar
-              </button>
-            </div>
-
-            {adminAtivo && (
-              <div className="acoes-admin">
-                <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
-                <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
-                  Remover
+              <div className="card-acoes">
+                <button
+                  className="botao-secundario"
+                  onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
+                >
+                  Detalhes
+                </button>
+                <button
+                  className="botao-primario"
+                  disabled={!disponivelReal || comprando === produto.id}
+                  onClick={() => simularCompra(produto)}
+                >
+                  {comprando === produto.id ? 'Processando...' : 'Simular compra'}
                 </button>
               </div>
-            )}
-          </div>
-        ))}
+
+              {adminAtivo && (
+                <div className="acoes-admin">
+                  <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
+                  <button onClick={() => setProdutoEstoque(produto)}>Estoque de códigos</button>
+                  <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
+                    Remover
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        })}
 
         {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
       </div>
@@ -248,8 +290,16 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       <ProductDetailsModal
         produto={produtoDetalhe}
         onFechar={() => setProdutoDetalhe(null)}
-        onComprar={comprar}
+        onComprar={simularCompra}
       />
+
+      {produtoEstoque && (
+        <GerenciarEstoqueModal
+          produto={produtoEstoque}
+          onFechar={() => setProdutoEstoque(null)}
+          onEstoqueAlterado={recarregarProdutos}
+        />
+      )}
 
       {produtoEditando && (
         <div className="overlay" onClick={() => setProdutoEditando(null)}>

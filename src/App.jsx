@@ -15,15 +15,30 @@ import './App.css'
 
 function App() {
   const [produtos, setProdutos] = useState([])
+  const [estoque, setEstoque] = useState({})
   const [modoAdminAtivo, setModoAdminAtivo] = useState(false)
 
   async function carregarProdutos() {
-    const { data, error } = await supabase.from('products').select('*').order('created_at')
-    if (error) {
-      console.error(error)
+    const [produtosResp, estoqueResp] = await Promise.all([
+      supabase.from('products').select('*').order('created_at'),
+      supabase.from('estoque_disponivel').select('*'),
+    ])
+
+    if (produtosResp.error) {
+      console.error(produtosResp.error)
       return
     }
-    setProdutos(data)
+    setProdutos(produtosResp.data)
+
+    if (estoqueResp.error) {
+      console.error(estoqueResp.error)
+      return
+    }
+    const mapa = {}
+    estoqueResp.data.forEach((linha) => {
+      mapa[linha.product_id] = linha.disponivel
+    })
+    setEstoque(mapa)
   }
 
   useEffect(() => {
@@ -37,7 +52,12 @@ function App() {
         <Hero produtosDestaque={produtos.slice(0, 4)} />
         <TrustBar />
         <HowItWorks />
-        <Catalog produtos={produtos} recarregarProdutos={carregarProdutos} modoAdmin={modoAdminAtivo} />
+        <Catalog
+          produtos={produtos}
+          estoque={estoque}
+          recarregarProdutos={carregarProdutos}
+          modoAdmin={modoAdminAtivo}
+        />
         <WhyBuy />
         <Faq />
         <CtaFinal />

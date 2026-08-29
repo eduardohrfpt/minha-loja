@@ -65,7 +65,9 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
               -{produto.discount}% · economize {formatarPreco(economia)}
             </span>
           )}
-          {produto.estoque != null && <span className="badge-estoque">{produto.estoque} em estoque</span>}
+          {(produto.estoqueReal ?? produto.estoque) != null && (
+            <span className="badge-estoque">{produto.estoqueReal ?? produto.estoque} em estoque</span>
+          )}
         </div>
 
         <div className="grid-info">
@@ -168,13 +170,13 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
             <button onClick={onFechar}>Fechar</button>
             <button
               className="botao-primario"
-              disabled={!produto.available}
+              disabled={!(produto.disponivelReal ?? produto.available)}
               onClick={() => {
                 onComprar(produto)
                 onFechar()
               }}
             >
-              Comprar agora
+              Simular compra
             </button>
           </div>
         </div>

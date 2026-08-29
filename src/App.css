@@ -1153,6 +1153,119 @@
 
 /* Botão flutuante de admin */
 
+.modal-estoque {
+  background: #fff;
+  border-radius: var(--raio);
+  padding: 28px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.estoque-resumo {
+  display: flex;
+  gap: 8px;
+}
+
+.badge-usado {
+  background: var(--bg-alt);
+  color: var(--texto-suave);
+  border-color: var(--borda);
+}
+
+.estoque-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.estoque-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--texto);
+}
+
+.estoque-form textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  font-size: 13px;
+  font-family: var(--mono, monospace);
+  resize: vertical;
+}
+
+.estoque-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.estoque-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  font-size: 13px;
+}
+
+.estoque-linha code {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.pedido-item {
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pedido-item-topo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pedido-item-topo > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.pedido-preco {
+  font-weight: 700;
+  color: var(--titulo);
+}
+
+.pedido-item-detalhe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.pedido-item-detalhe code {
+  font-family: monospace;
+  background: var(--bg-alt);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
 .admin-flutuante {
   position: fixed;
   bottom: 24px;

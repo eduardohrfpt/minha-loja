@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { rolarPara } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import AuthModal from './AuthModal'
+import MyOrdersModal from './MyOrdersModal'
 
 const linksNav = [
   { id: 'produtos', label: 'Produtos' },
@@ -12,6 +13,7 @@ const linksNav = [
 function Header() {
   const { usuario, sair } = useAuth()
   const [modalAberto, setModalAberto] = useState(null)
+  const [minhasComprasAberto, setMinhasComprasAberto] = useState(false)
 
   return (
     <header className="cabecalho">
@@ -33,6 +35,9 @@ function Header() {
           {usuario ? (
             <>
               <span className="usuario-logado">{usuario.user_metadata?.nome || usuario.email}</span>
+              <button className="botao-fantasma" onClick={() => setMinhasComprasAberto(true)}>
+                Minhas compras
+              </button>
               <button className="botao-fantasma" onClick={sair}>
                 Sair
               </button>
@@ -51,6 +56,7 @@ function Header() {
       </div>
 
       {modalAberto && <AuthModal modoInicial={modalAberto} onFechar={() => setModalAberto(null)} />}
+      {minhasComprasAberto && <MyOrdersModal onFechar={() => setMinhasComprasAberto(false)} />}
     </header>
   )
 }
