@@ -94,6 +94,17 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
           </div>
         )}
 
+        {produto.features?.length > 0 && (
+          <div className="detalhe-bloco">
+            <h4>O que está incluso</h4>
+            <ul className="detalhe-lista">
+              {produto.features.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="detalhe-bloco">
           <h4>Como ativar</h4>
           <ol className="detalhe-lista-numerada">

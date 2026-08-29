@@ -664,6 +664,16 @@
   color: var(--texto-suave);
 }
 
+.detalhe-lista {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--texto);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .detalhe-lista-numerada {
   margin: 0;
   padding-left: 20px;
