@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
+import ProductDetailsModal from './ProductDetailsModal'
 
 const formVazio = {
   name: '',
@@ -15,6 +16,33 @@ const formVazio = {
   discount: '',
   description: '',
   features: [],
+  tagline: '',
+  beneficios: [],
+  estoque: '',
+  passos_ativacao: [],
+  aviso_prazo: '',
+  resumo_final: '',
+}
+
+function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeholder }) {
+  return (
+    <label>
+      {label}
+      <div className="lista-itens">
+        {itens.map((item, indice) => (
+          <div className="lista-itens-linha" key={indice}>
+            <input value={item} onChange={(e) => aoAtualizar(indice, e.target.value)} placeholder={placeholder} />
+            <button type="button" onClick={() => aoRemover(indice)} aria-label="Remover item">
+              ×
+            </button>
+          </div>
+        ))}
+        <button type="button" className="botao-add-item" onClick={aoAdicionar}>
+          + Adicionar item
+        </button>
+      </div>
+    </label>
+  )
 }
 
 function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
@@ -46,24 +74,30 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       discount: produto.discount,
       description: produto.description || '',
       features: produto.features || [],
+      tagline: produto.tagline || '',
+      beneficios: produto.beneficios || [],
+      estoque: produto.estoque ?? '',
+      passos_ativacao: produto.passos_ativacao || [],
+      aviso_prazo: produto.aviso_prazo || '',
+      resumo_final: produto.resumo_final || '',
     })
     setProdutoEditando(produto.id)
   }
 
-  function adicionarItemFeature() {
-    setForm((f) => ({ ...f, features: [...f.features, ''] }))
+  function adicionarItem(campo) {
+    setForm((f) => ({ ...f, [campo]: [...f[campo], ''] }))
   }
 
-  function atualizarItemFeature(indice, valor) {
+  function atualizarItem(campo, indice, valor) {
     setForm((f) => {
-      const novas = [...f.features]
-      novas[indice] = valor
-      return { ...f, features: novas }
+      const novos = [...f[campo]]
+      novos[indice] = valor
+      return { ...f, [campo]: novos }
     })
   }
 
-  function removerItemFeature(indice) {
-    setForm((f) => ({ ...f, features: f.features.filter((_, i) => i !== indice) }))
+  function removerItem(campo, indice) {
+    setForm((f) => ({ ...f, [campo]: f[campo].filter((_, i) => i !== indice) }))
   }
 
   async function salvarProduto(e) {
@@ -92,6 +126,12 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
       discount,
       description: form.description,
       features: form.features.map((item) => item.trim()).filter(Boolean),
+      tagline: form.tagline,
+      beneficios: form.beneficios.map((item) => item.trim()).filter(Boolean),
+      estoque: form.estoque === '' ? null : parseInt(form.estoque, 10),
+      passos_ativacao: form.passos_ativacao.map((item) => item.trim()).filter(Boolean),
+      aviso_prazo: form.aviso_prazo,
+      resumo_final: form.resumo_final,
     }
 
     setSalvando(true)
@@ -205,56 +245,11 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
         {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
       </div>
 
-      {produtoDetalhe && (
-        <div className="overlay" onClick={() => setProdutoDetalhe(null)}>
-          <div className="modal-detalhes" onClick={(e) => e.stopPropagation()}>
-            <span className="icone-marca icone-marca-grande">{produtoDetalhe.image}</span>
-            <h3>{produtoDetalhe.name}</h3>
-            <span className="card-marca">{produtoDetalhe.brand}</span>
-            <p className="descricao-produto">
-              Duração: {produtoDetalhe.duration || 'não informada'} · Entrega:{' '}
-              {produtoDetalhe.delivery_type === 'imediata' ? 'imediata' : 'manual'}
-            </p>
-            <span className={`disponibilidade ${produtoDetalhe.available ? 'ok' : 'indisponivel'}`}>
-              <i />
-              {produtoDetalhe.available ? 'Em estoque' : 'Indisponível'}
-            </span>
-
-            {produtoDetalhe.description && (
-              <div className="detalhe-bloco">
-                <h4>Descrição completa</h4>
-                <p className="detalhe-texto-livre">{produtoDetalhe.description}</p>
-              </div>
-            )}
-
-            {produtoDetalhe.features?.length > 0 && (
-              <div className="detalhe-bloco">
-                <h4>O que está incluso</h4>
-                <ul className="detalhe-lista">
-                  {produtoDetalhe.features.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <span className="preco-final">{formatarPreco(produtoDetalhe.price)}</span>
-            <div className="acoes-formulario">
-              <button onClick={() => setProdutoDetalhe(null)}>Fechar</button>
-              <button
-                className="botao-primario"
-                disabled={!produtoDetalhe.available}
-                onClick={() => {
-                  comprar(produtoDetalhe)
-                  setProdutoDetalhe(null)
-                }}
-              >
-                Comprar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ProductDetailsModal
+        produto={produtoDetalhe}
+        onFechar={() => setProdutoDetalhe(null)}
+        onComprar={comprar}
+      />
 
       {produtoEditando && (
         <div className="overlay" onClick={() => setProdutoEditando(null)}>
@@ -311,6 +306,14 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
               Disponível em estoque
             </label>
             <label>
+              Tagline (subtítulo curto)
+              <input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Ex: A escolha certa para produtividade" />
+            </label>
+            <label>
+              Estoque disponível
+              <input type="number" step="1" value={form.estoque} onChange={(e) => setForm({ ...form, estoque: e.target.value })} placeholder="Ex: 15" />
+            </label>
+            <label>
               Descrição completa
               <textarea
                 rows={4}
@@ -319,25 +322,42 @@ function Catalog({ produtos, recarregarProdutos, modoAdmin }) {
                 placeholder="Escreva os detalhes do produto, pode usar vários parágrafos."
               />
             </label>
+            <CampoLista
+              label="O que está incluso"
+              itens={form.features}
+              aoAdicionar={() => adicionarItem('features')}
+              aoAtualizar={(indice, valor) => atualizarItem('features', indice, valor)}
+              aoRemover={(indice) => removerItem('features', indice)}
+              placeholder="Ex: Suporte via WhatsApp"
+            />
+            <CampoLista
+              label="Benefícios (aparecem com check verde)"
+              itens={form.beneficios}
+              aoAdicionar={() => adicionarItem('beneficios')}
+              aoAtualizar={(indice, valor) => atualizarItem('beneficios', indice, valor)}
+              aoRemover={(indice) => removerItem('beneficios', indice)}
+              placeholder="Ex: Sem anúncios"
+            />
+            <CampoLista
+              label="Passos de ativação"
+              itens={form.passos_ativacao}
+              aoAdicionar={() => adicionarItem('passos_ativacao')}
+              aoAtualizar={(indice, valor) => atualizarItem('passos_ativacao', indice, valor)}
+              aoRemover={(indice) => removerItem('passos_ativacao', indice)}
+              placeholder="Ex: Acesse o link recebido por e-mail"
+            />
             <label>
-              O que está incluso
-              <div className="lista-itens">
-                {form.features.map((item, indice) => (
-                  <div className="lista-itens-linha" key={indice}>
-                    <input
-                      value={item}
-                      onChange={(e) => atualizarItemFeature(indice, e.target.value)}
-                      placeholder="Ex: Suporte via WhatsApp"
-                    />
-                    <button type="button" onClick={() => removerItemFeature(indice)} aria-label="Remover item">
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <button type="button" className="botao-add-item" onClick={adicionarItemFeature}>
-                  + Adicionar item
-                </button>
-              </div>
+              Aviso de prazo (opcional)
+              <textarea
+                rows={2}
+                value={form.aviso_prazo}
+                onChange={(e) => setForm({ ...form, aviso_prazo: e.target.value })}
+                placeholder="Ex: Oferta válida somente até o fim do estoque"
+              />
+            </label>
+            <label>
+              Frase resumo final (opcional)
+              <input value={form.resumo_final} onChange={(e) => setForm({ ...form, resumo_final: e.target.value })} placeholder="Ex: A forma mais barata de ter o ChatGPT Plus" />
             </label>
 
             <div className="acoes-formulario">

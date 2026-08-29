@@ -17,6 +17,12 @@ create table if not exists products (
   discount numeric(5,2) not null default 0,
   description text,
   features text[] not null default '{}',
+  tagline text,
+  beneficios text[] not null default '{}',
+  estoque integer,
+  passos_ativacao text[] not null default '{}',
+  aviso_prazo text,
+  resumo_final text,
   created_at timestamptz not null default now()
 );
 
