@@ -176,7 +176,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
                 onFechar()
               }}
             >
-              Simular compra
+              Comprar agora
             </button>
           </div>
         </div>

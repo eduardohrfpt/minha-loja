@@ -165,36 +165,38 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
     recarregarProdutos()
   }
 
-  async function simularCompra(produto) {
+  async function comprarAgora(produto) {
     if (!usuario) {
       alert('Você precisa entrar na sua conta para comprar. Clique em "Entrar" no topo da página.')
       return
     }
 
     setComprando(produto.id)
-    const { data, error } = await supabase.rpc('resgatar_codigo', { p_product_id: produto.id })
-    setComprando(null)
 
-    if (error) {
-      alert(`Não foi possível concluir a compra: ${error.message}`)
-      return
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+
+      const resposta = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId: produto.id }),
+      })
+
+      const resultado = await resposta.json()
+
+      if (!resposta.ok) {
+        throw new Error(resultado.error || 'Não foi possível iniciar o pagamento.')
+      }
+
+      window.location.href = resultado.url
+    } catch (err) {
+      alert(`Não foi possível concluir a compra: ${err.message}`)
+      setComprando(null)
     }
-
-    const codigo = data?.[0]?.codigo
-    alert(`Compra confirmada! Seu código: ${codigo}`)
-
-    fetch('/api/send-order-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: usuario.email,
-        nome: usuario.user_metadata?.nome,
-        produtoNome: produto.name,
-        codigo,
-      }),
-    }).catch((err) => console.error('Falha ao enviar e-mail de confirmação:', err))
-
-    recarregarProdutos()
   }
 
   return (
@@ -265,9 +267,9 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
                 <button
                   className="botao-primario"
                   disabled={!disponivelReal || comprando === produto.id}
-                  onClick={() => simularCompra(produto)}
+                  onClick={() => comprarAgora(produto)}
                 >
-                  {comprando === produto.id ? 'Processando...' : 'Simular compra'}
+                  {comprando === produto.id ? 'Redirecionando...' : 'Comprar agora'}
                 </button>
               </div>
 
@@ -290,7 +292,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       <ProductDetailsModal
         produto={produtoDetalhe}
         onFechar={() => setProdutoDetalhe(null)}
-        onComprar={simularCompra}
+        onComprar={comprarAgora}
       />
 
       {produtoEstoque && (
