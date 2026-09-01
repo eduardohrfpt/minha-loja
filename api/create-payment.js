@@ -1,5 +1,9 @@
-import { stripe } from './_lib/stripe.js'
+import { asaasFetch, obterOuCriarCliente } from './_lib/asaas.js'
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
+
+function limparDocumento(valor) {
+  return (valor || '').replace(/\D/g, '')
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,7 +12,8 @@ export default async function handler(req, res) {
   }
 
   const token = (req.headers.authorization || '').replace('Bearer ', '')
-  const { productId } = req.body || {}
+  const { productId, cpfCnpj } = req.body || {}
+  const documento = limparDocumento(cpfCnpj)
 
   if (!token) {
     res.status(401).json({ error: 'Você precisa entrar na sua conta para comprar.' })
@@ -16,6 +21,10 @@ export default async function handler(req, res) {
   }
   if (!productId) {
     res.status(400).json({ error: 'Produto inválido.' })
+    return
+  }
+  if (documento.length !== 11 && documento.length !== 14) {
+    res.status(400).json({ error: 'Informe um CPF ou CNPJ válido.' })
     return
   }
 
@@ -51,37 +60,32 @@ export default async function handler(req, res) {
     return
   }
 
-  const origem = req.headers.origin || `https://${req.headers.host}`
-
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card', 'pix'],
-      customer_email: usuario.email,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'brl',
-            unit_amount: Math.round(Number(produto.price) * 100),
-            product_data: { name: produto.name },
-          },
-        },
-      ],
-      payment_method_options: {
-        pix: { expires_after_seconds: 3600 },
-      },
-      metadata: {
-        product_id: produto.id,
-        user_id: usuario.id,
-      },
-      success_url: `${origem}/?checkout=sucesso`,
-      cancel_url: `${origem}/?checkout=cancelado`,
+    const clienteId = await obterOuCriarCliente({
+      nome: usuario.user_metadata?.nome || usuario.email,
+      email: usuario.email,
+      cpfCnpj: documento,
     })
 
-    res.status(200).json({ url: session.url })
+    const vencimento = new Date()
+    vencimento.setDate(vencimento.getDate() + 3)
+    const dataVencimento = vencimento.toISOString().slice(0, 10)
+
+    const cobranca = await asaasFetch('/payments', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer: clienteId,
+        billingType: 'UNDEFINED',
+        value: Number(produto.price),
+        dueDate: dataVencimento,
+        description: produto.name,
+        externalReference: JSON.stringify({ product_id: produto.id, user_id: usuario.id }),
+      }),
+    })
+
+    res.status(200).json({ url: cobranca.invoiceUrl })
   } catch (err) {
-    console.error('Erro ao criar sessão de checkout:', err)
+    console.error('Erro ao criar cobrança no Asaas:', err)
     res.status(500).json({ error: 'Não foi possível iniciar o pagamento.' })
   }
 }

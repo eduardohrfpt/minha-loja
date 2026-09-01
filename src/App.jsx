@@ -45,19 +45,6 @@ function App() {
     carregarProdutos()
   }, [])
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const checkout = params.get('checkout')
-    if (!checkout) return
-
-    window.history.replaceState({}, '', window.location.pathname)
-
-    if (checkout === 'sucesso') {
-      alert('Pagamento confirmado! Seu código foi enviado por e-mail e também está em "Minhas compras".')
-      carregarProdutos()
-    }
-  }, [])
-
   return (
     <AuthProvider>
       <div className="app">

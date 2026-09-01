@@ -171,19 +171,38 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       return
     }
 
+    let cpfCnpj = usuario.user_metadata?.cpf_cnpj
+
+    if (!cpfCnpj) {
+      const digitado = prompt('Para gerar o pagamento (Pix, cartão ou boleto), informe seu CPF ou CNPJ:')
+      if (!digitado) return
+
+      cpfCnpj = digitado.replace(/\D/g, '')
+      if (cpfCnpj.length !== 11 && cpfCnpj.length !== 14) {
+        alert('CPF ou CNPJ inválido.')
+        return
+      }
+
+      const { error: erroPerfil } = await supabase.auth.updateUser({ data: { cpf_cnpj: cpfCnpj } })
+      if (erroPerfil) {
+        alert(`Não foi possível salvar seu CPF/CNPJ: ${erroPerfil.message}`)
+        return
+      }
+    }
+
     setComprando(produto.id)
 
     try {
       const { data: sessionData } = await supabase.auth.getSession()
       const token = sessionData?.session?.access_token
 
-      const resposta = await fetch('/api/create-checkout-session', {
+      const resposta = await fetch('/api/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ productId: produto.id }),
+        body: JSON.stringify({ productId: produto.id, cpfCnpj }),
       })
 
       const resultado = await resposta.json()
