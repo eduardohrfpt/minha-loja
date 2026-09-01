@@ -42,6 +42,7 @@ export default async function handler(req, res) {
     p_product_id: productId,
     p_user_id: userId,
     p_payment_id: payment.id,
+    p_gateway: 'asaas',
   })
 
   if (error) {

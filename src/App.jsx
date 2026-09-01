@@ -45,6 +45,23 @@ function App() {
     carregarProdutos()
   }, [])
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const pagamento = params.get('pagamento')
+    if (!pagamento) return
+
+    window.history.replaceState({}, '', window.location.pathname)
+
+    if (pagamento === 'sucesso') {
+      alert('Pagamento aprovado! Seu código foi enviado por e-mail e também está em "Minhas compras".')
+      carregarProdutos()
+    } else if (pagamento === 'pendente') {
+      alert('Pagamento em análise. Assim que for aprovado, o código será enviado por e-mail.')
+    } else if (pagamento === 'falha') {
+      alert('Não foi possível concluir o pagamento. Tente novamente.')
+    }
+  }, [])
+
   return (
     <AuthProvider>
       <div className="app">
