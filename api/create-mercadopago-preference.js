@@ -69,11 +69,17 @@ export default async function handler(req, res) {
         // Formato compacto (não JSON), consistente com o que já é usado na integração Asaas.
         external_reference: `${produto.id}:${usuario.id}`,
         notification_url: `${origem}/api/mercadopago-webhook`,
+        // O Mercado Pago sempre acrescenta seus próprios parâmetros (payment_id, status, etc.)
+        // na URL de retorno, então as três apontam pro mesmo lugar -- é o App.jsx que decide
+        // o que mostrar com base nesses parâmetros.
         back_urls: {
-          success: `${origem}/?pagamento=sucesso`,
-          failure: `${origem}/?pagamento=falha`,
-          pending: `${origem}/?pagamento=pendente`,
+          success: `${origem}/`,
+          failure: `${origem}/`,
+          pending: `${origem}/`,
         },
+        // Só redireciona automaticamente pra pagamentos aprovados na hora (cartão). Pix e
+        // boleto ficam pendentes na tela do Mercado Pago até o comprador voltar manualmente
+        // ou o auto_return não se aplicar -- por isso o polling em App.jsx cobre os dois casos.
         auto_return: 'approved',
       }),
     })
