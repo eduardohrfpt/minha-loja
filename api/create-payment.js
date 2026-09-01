@@ -79,7 +79,9 @@ export default async function handler(req, res) {
         value: Number(produto.price),
         dueDate: dataVencimento,
         description: produto.name,
-        externalReference: JSON.stringify({ product_id: produto.id, user_id: usuario.id }),
+        // Formato compacto (não JSON): o Asaas limita externalReference a 100 caracteres,
+        // e "{"product_id":"<uuid>","user_id":"<uuid>"}" já passa disso.
+        externalReference: `${produto.id}:${usuario.id}`,
       }),
     })
 

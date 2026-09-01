@@ -26,14 +26,9 @@ export default async function handler(req, res) {
     return
   }
 
-  let referencia = {}
-  try {
-    referencia = JSON.parse(payment.externalReference || '{}')
-  } catch {
-    referencia = {}
-  }
-
-  const { product_id: productId, user_id: userId } = referencia
+  // Formato compacto "productId:userId" (ver api/create-payment.js) -- o Asaas limita
+  // externalReference a 100 caracteres, o que não cabe num JSON com dois uuids.
+  const [productId, userId] = (payment.externalReference || '').split(':')
 
   if (!productId || !userId) {
     console.error('Cobrança do Asaas sem externalReference esperada:', payment.id)
