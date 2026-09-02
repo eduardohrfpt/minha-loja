@@ -129,6 +129,10 @@
 
 /* Hero */
 
+.hero-fundo {
+  background: var(--bg-alt);
+}
+
 .hero {
   max-width: 1180px;
   margin: 0 auto;
@@ -172,6 +176,11 @@
   color: var(--texto-suave);
   max-width: 46ch;
   margin-bottom: 28px;
+}
+
+.hero-acoes {
+  display: flex;
+  justify-content: center;
 }
 
 .hero-card {
