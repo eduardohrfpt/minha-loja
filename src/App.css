@@ -1450,7 +1450,7 @@
   border-radius: var(--raio);
   padding: 28px;
   width: 100%;
-  max-width: 920px;
+  max-width: 980px;
   max-height: 85vh;
   overflow-y: auto;
   display: flex;
@@ -1462,7 +1462,7 @@
 .modal-pedidos-cabecalho {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -1473,6 +1473,66 @@
   border-radius: var(--raio-sm);
   font-size: 14px;
   min-width: 260px;
+}
+
+.pedidos-resumo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr)) minmax(220px, 1.4fr);
+  gap: 14px;
+}
+
+.stat-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.stat-card-valor {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--titulo);
+}
+
+.stat-card-produtos {
+  gap: 8px;
+}
+
+.stat-card-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.stat-card-lista li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--texto);
+}
+
+.stat-card-lista li strong {
+  color: var(--verde-escuro);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .pedidos-resumo {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tabela-pedidos-scroll {

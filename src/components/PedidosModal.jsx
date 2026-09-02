@@ -41,11 +41,54 @@ function PedidosModal({ onFechar }) {
     )
   }, [pedidos, busca])
 
+  // Resumo sempre reflete TODOS os pedidos, não só o que a busca está filtrando na tabela.
+  const resumo = useMemo(() => {
+    const aprovados = pedidos.filter((pedido) => pedido.status === 'aprovado')
+    const totalReais = aprovados.reduce((soma, pedido) => soma + Number(pedido.valor), 0)
+
+    const contagemPorProduto = new Map()
+    for (const pedido of aprovados) {
+      contagemPorProduto.set(pedido.product_name, (contagemPorProduto.get(pedido.product_name) || 0) + 1)
+    }
+    const vendasPorProduto = [...contagemPorProduto.entries()].sort((a, b) => b[1] - a[1])
+
+    return { totalVendas: aprovados.length, totalReais, vendasPorProduto }
+  }, [pedidos])
+
   return createPortal(
     <div className="overlay" onClick={onFechar}>
       <div className="modal-pedidos" onClick={(e) => e.stopPropagation()}>
+        <h2>Pedidos</h2>
+
+        {!carregando && (
+          <div className="pedidos-resumo">
+            <div className="stat-card">
+              <span className="stat-card-label">Vendas concluídas</span>
+              <strong className="stat-card-valor">{resumo.totalVendas}</strong>
+            </div>
+            <div className="stat-card">
+              <span className="stat-card-label">Total em vendas</span>
+              <strong className="stat-card-valor">{formatarPreco(resumo.totalReais)}</strong>
+            </div>
+            <div className="stat-card stat-card-produtos">
+              <span className="stat-card-label">Vendas por produto</span>
+              {resumo.vendasPorProduto.length === 0 ? (
+                <span className="tabela-pedidos-vazio">Nenhuma venda concluída ainda.</span>
+              ) : (
+                <ul className="stat-card-lista">
+                  {resumo.vendasPorProduto.map(([nome, quantidade]) => (
+                    <li key={nome}>
+                      <span>{nome}</span>
+                      <strong>{quantidade}</strong>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="modal-pedidos-cabecalho">
-          <h2>Pedidos</h2>
           <input
             type="search"
             placeholder="Buscar por e-mail ou produto..."
