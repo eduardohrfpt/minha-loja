@@ -139,15 +139,16 @@
   align-items: center;
 }
 
-.etiqueta-eyebrow {
+.banner-destaque {
   display: inline-block;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--verde-escuro);
-  background: rgba(16, 185, 129, 0.1);
-  padding: 6px 14px;
-  border-radius: 999px;
-  margin-bottom: 16px;
+  background: #d1fae5;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 12px 22px;
+  border-radius: var(--raio-sm);
+  margin-bottom: 20px;
 }
 
 .hero h1 {

@@ -4,7 +4,7 @@ function Hero({ produtosDestaque }) {
   return (
     <section id="topo" className="hero">
       <div className="hero-texto">
-        <span className="etiqueta-eyebrow">Licenças originais, direto da fonte</span>
+        <span className="banner-destaque">Economize até 90% em assinaturas premium</span>
         <h1>Assinaturas premium por um preço muito mais baixo. Até 90% mais barato, aproveite!</h1>
         <p className="hero-subtitulo">
           Negociamos condições especiais com fornecedores autorizados para garantir os melhores
