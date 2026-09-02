@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 
-function PagamentoStatusModal({ estado, produtoNome, codigo, onFechar }) {
+function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, onFechar }) {
   const podeFechar = estado !== 'confirmando'
 
   return createPortal(
@@ -28,6 +28,16 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, onFechar }) {
               <span>Seu código de ativação</span>
               <code>{codigo}</code>
             </div>
+            {guiaUso?.length > 0 && (
+              <div className="detalhe-bloco">
+                <h4>Como usar seu código</h4>
+                <ol className="detalhe-lista-numerada">
+                  {guiaUso.map((passo, indice) => (
+                    <li key={indice}>{passo}</li>
+                  ))}
+                </ol>
+              </div>
+            )}
             <p className="detalhe-texto-livre detalhe-texto-pequeno">
               Também enviamos esse código para o seu e-mail. Ele fica disponível em "Minhas compras" a qualquer
               momento.

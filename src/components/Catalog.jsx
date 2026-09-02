@@ -21,6 +21,7 @@ const formVazio = {
   beneficios: [],
   estoque: '',
   passos_ativacao: [],
+  guia_uso_codigo: [],
   aviso_prazo: '',
   resumo_final: '',
 }
@@ -56,6 +57,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
   const [produtoEstoque, setProdutoEstoque] = useState(null)
   const [salvando, setSalvando] = useState(false)
   const [comprando, setComprando] = useState(null)
+  const [produtoConfirmando, setProdutoConfirmando] = useState(null)
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -81,6 +83,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       beneficios: produto.beneficios || [],
       estoque: produto.estoque ?? '',
       passos_ativacao: produto.passos_ativacao || [],
+      guia_uso_codigo: produto.guia_uso_codigo || [],
       aviso_prazo: produto.aviso_prazo || '',
       resumo_final: produto.resumo_final || '',
     })
@@ -133,6 +136,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       beneficios: form.beneficios.map((item) => item.trim()).filter(Boolean),
       estoque: form.estoque === '' ? null : parseInt(form.estoque, 10),
       passos_ativacao: form.passos_ativacao.map((item) => item.trim()).filter(Boolean),
+      guia_uso_codigo: form.guia_uso_codigo.map((item) => item.trim()).filter(Boolean),
       aviso_prazo: form.aviso_prazo,
       resumo_final: form.resumo_final,
     }
@@ -165,12 +169,17 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
     recarregarProdutos()
   }
 
-  async function comprarAgora(produto) {
+  function comprarAgora(produto) {
     if (!usuario) {
       alert('Você precisa entrar na sua conta para comprar. Clique em "Entrar" no topo da página.')
       return
     }
+    setProdutoConfirmando(produto)
+  }
 
+  async function iniciarCheckout() {
+    const produto = produtoConfirmando
+    setProdutoConfirmando(null)
     setComprando(produto.id)
 
     try {
@@ -303,6 +312,27 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
         />
       )}
 
+      {produtoConfirmando && (
+        <div className="overlay" onClick={() => setProdutoConfirmando(null)}>
+          <div className="modal-status-pagamento" onClick={(e) => e.stopPropagation()}>
+            <h2>Antes de continuar</h2>
+            <p className="detalhe-texto-livre">
+              Você vai ser levado para o checkout do Mercado Pago. <strong>Depois de pagar, clique em "Voltar para a
+              loja"</strong> na própria tela do Mercado Pago para ver seu código na hora, sem precisar procurar nada.
+              Se preferir, o código também será enviado para o seu e-mail.
+            </p>
+            <div className="acoes-formulario">
+              <button type="button" onClick={() => setProdutoConfirmando(null)}>
+                Cancelar
+              </button>
+              <button type="button" className="botao-primario" onClick={iniciarCheckout}>
+                Continuar para pagamento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {produtoEditando && (
         <div className="overlay" onClick={() => setProdutoEditando(null)}>
           <form className="formulario" onClick={(e) => e.stopPropagation()} onSubmit={salvarProduto}>
@@ -397,6 +427,14 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
               aoAtualizar={(indice, valor) => atualizarItem('passos_ativacao', indice, valor)}
               aoRemover={(indice) => removerItem('passos_ativacao', indice)}
               placeholder="Ex: Acesse o link recebido por e-mail"
+            />
+            <CampoLista
+              label='Passo a passo pós-compra (aparece na tela de "Pagamento aprovado")'
+              itens={form.guia_uso_codigo}
+              aoAdicionar={() => adicionarItem('guia_uso_codigo')}
+              aoAtualizar={(indice, valor) => atualizarItem('guia_uso_codigo', indice, valor)}
+              aoRemover={(indice) => removerItem('guia_uso_codigo', indice)}
+              placeholder="Ex: Acesse contas.exemplo.com e cole o código no campo Ativação"
             />
             <label>
               Aviso de prazo (opcional)

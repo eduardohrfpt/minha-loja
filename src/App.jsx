@@ -80,13 +80,18 @@ function App() {
 
         const { data } = await supabase
           .from('orders')
-          .select('products(name), codigos_produto(codigo)')
+          .select('products(name, guia_uso_codigo), codigos_produto(codigo)')
           .eq('payment_id', paymentId)
           .maybeSingle()
 
         const codigo = data?.codigos_produto?.[0]?.codigo
         if (codigo) {
-          setStatusPagamento({ estado: 'sucesso', produtoNome: data.products?.name, codigo })
+          setStatusPagamento({
+            estado: 'sucesso',
+            produtoNome: data.products?.name,
+            guiaUso: data.products?.guia_uso_codigo || [],
+            codigo,
+          })
           carregarProdutos()
           return
         }
@@ -134,6 +139,7 @@ function App() {
             estado={statusPagamento.estado}
             produtoNome={statusPagamento.produtoNome}
             codigo={statusPagamento.codigo}
+            guiaUso={statusPagamento.guiaUso}
             onFechar={fecharStatusPagamento}
           />
         )}
