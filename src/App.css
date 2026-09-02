@@ -129,11 +129,18 @@
 
 /* Hero */
 
+/* Só reserva o espaço pra não ficar embaixo do cabeçalho fixo e separar da próxima seção --
+   sem fundo, pra não virar uma faixa cinza maior que o conteúdo da .hero em si. */
+.hero-secao {
+  padding: 96px 24px 56px;
+}
+
 .hero {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 128px 24px 80px;
+  padding: 40px 32px;
   background: var(--bg-alt);
+  border-radius: var(--raio);
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
@@ -244,9 +251,11 @@
 }
 
 @media (max-width: 900px) {
+  .hero-secao {
+    padding-top: 76px;
+  }
   .hero {
     grid-template-columns: 1fr;
-    padding-top: 108px;
   }
   .hero h1 {
     font-size: 34px;
