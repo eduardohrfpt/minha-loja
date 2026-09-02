@@ -958,6 +958,15 @@
   color: var(--texto);
 }
 
+/* .acoes-formulario button (classe + elemento) é mais específico que .botao-primario
+   (só classe) sozinho, então sem isso o fundo branco acima vencia o verde em todo botão
+   primário dentro de um .acoes-formulario -- reforça aqui pra sempre ganhar. */
+.acoes-formulario .botao-primario {
+  background: var(--verde);
+  color: #fff;
+  border-color: transparent;
+}
+
 /* Por que comprar */
 
 .beneficios {
@@ -1295,6 +1304,10 @@
 .modal-status-pagamento .acoes-formulario {
   margin-top: 10px;
   gap: 12px;
+}
+
+.modal-status-pagamento .acoes-formulario button:not(.botao-primario) {
+  border-color: var(--texto-suave);
 }
 
 .modal-status-pagamento .acoes-formulario button {
