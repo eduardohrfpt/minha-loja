@@ -147,6 +147,10 @@
   align-items: center;
 }
 
+.hero-texto {
+  text-align: center;
+}
+
 .banner-destaque {
   display: block;
   width: fit-content;
@@ -173,14 +177,14 @@
   line-height: 1.3;
   color: var(--verde-escuro);
   max-width: 46ch;
-  margin-bottom: 14px;
+  margin: 0 auto 14px;
 }
 
 .hero-subtitulo {
   font-size: 17px;
   color: var(--texto-suave);
   max-width: 46ch;
-  margin-bottom: 28px;
+  margin: 0 auto 28px;
 }
 
 .hero-acoes {
