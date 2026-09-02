@@ -5,10 +5,8 @@ function Hero({ produtosDestaque }) {
     <section id="topo" className="hero">
       <div className="hero-texto">
         <span className="banner-destaque">Economize até 90% em assinaturas premium</span>
-        <h1>
-          Assinaturas premium por um preço muito mais baixo. Acesso legítimo às plataformas
-          originais, com um desconto de até 90%. Aproveite!
-        </h1>
+        <h1>Assinaturas premium por um preço muito mais baixo.</h1>
+        <p className="hero-destaque">Acesso legítimo às plataformas originais, com um desconto de até 90%. Aproveite!</p>
         <p className="hero-subtitulo">
           Negociamos condições especiais com fornecedores autorizados para garantir os melhores
           preços. O produto é 100% original — a única diferença é que aqui você paga muito menos.
