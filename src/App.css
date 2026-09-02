@@ -307,12 +307,14 @@
 .secao {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 104px 24px;
 }
 
+/* Fundo um pouco mais contrastante que --bg-alt (usado em botões/hover/etc por toda a página),
+   só pra essas faixas alternadas ficarem visíveis o suficiente para guiar o olhar ao rolar. */
 .secao-alt {
   max-width: none;
-  background: var(--bg-alt);
+  background: #eef1f4;
 }
 .secao-alt > * {
   max-width: 1180px;
@@ -326,7 +328,7 @@
 
 .secao-cabecalho {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 .secao-cabecalho h2 {
