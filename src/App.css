@@ -1289,6 +1289,7 @@
 .modal-status-pagamento .detalhe-texto-livre {
   font-size: 16px;
   line-height: 1.6;
+  color: var(--titulo);
 }
 
 .modal-status-pagamento .acoes-formulario {

@@ -322,7 +322,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       {produtoConfirmando && (
         <div className="overlay" onClick={() => setProdutoConfirmando(null)}>
           <div className="modal-status-pagamento" onClick={(e) => e.stopPropagation()}>
-            <h2>Antes de continuar</h2>
+            <h2>Aviso importante</h2>
             <p className="detalhe-texto-livre">
               Após o pagamento, clique em <strong>"Voltar"</strong> na parte de baixo da tela para ver o código da
               sua compra na hora. Se preferir, também enviaremos por e-mail.
