@@ -4,6 +4,7 @@ import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
+import PedidosModal from './PedidosModal'
 
 const formVazio = {
   name: '',
@@ -58,6 +59,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
   const [salvando, setSalvando] = useState(false)
   const [comprando, setComprando] = useState(null)
   const [produtoConfirmando, setProdutoConfirmando] = useState(null)
+  const [pedidosAbertos, setPedidosAbertos] = useState(false)
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -217,11 +219,16 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
 
       {adminAtivo && (
         <div className="painel-admin">
+          <button className="botao-secundario" onClick={() => setPedidosAbertos(true)}>
+            Pedidos
+          </button>
           <button className="botao-novo" onClick={abrirFormularioNovo}>
             + Novo produto
           </button>
         </div>
       )}
+
+      {pedidosAbertos && <PedidosModal onFechar={() => setPedidosAbertos(false)} />}
 
       <div className="grade">
         {produtos.map((produto) => {

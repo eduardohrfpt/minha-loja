@@ -366,6 +366,7 @@
 .painel-admin {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -1365,4 +1366,109 @@
   background: var(--azul);
   color: #fff;
   border-color: var(--azul);
+}
+
+.modal-pedidos {
+  background: #fff;
+  border-radius: var(--raio);
+  padding: 28px;
+  width: 100%;
+  max-width: 920px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.modal-pedidos-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.modal-pedidos-cabecalho input[type='search'] {
+  padding: 9px 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  font-size: 14px;
+  min-width: 260px;
+}
+
+.tabela-pedidos-scroll {
+  overflow-x: auto;
+}
+
+.tabela-pedidos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabela-pedidos th {
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--texto-suave);
+  font-weight: 600;
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.tabela-pedidos td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borda);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.tabela-pedidos tbody tr:hover {
+  background: var(--bg-alt);
+}
+
+.tabela-pedidos code {
+  font-family: monospace;
+  background: var(--bg-alt);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.tabela-pedidos-vazio {
+  color: var(--texto-suave);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge-ok {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--verde-escuro);
+}
+
+.status-badge-pendente {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.status-badge-erro {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
 }

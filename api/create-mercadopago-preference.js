@@ -1,5 +1,6 @@
 import { mercadoPagoFetch, ehAmbienteTeste } from './_lib/mercadopago.js'
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { gerarCorrelacao, registrarPedidoPendente } from './_lib/historicoPedidos.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
   }
 
   const origem = req.headers.origin || `https://${req.headers.host}`
+  const correlacao = gerarCorrelacao()
 
   try {
     const preferencia = await mercadoPagoFetch('/checkout/preferences', {
@@ -67,7 +69,9 @@ export default async function handler(req, res) {
         ],
         payer: { email: usuario.email },
         // Formato compacto (não JSON), consistente com o que já é usado na integração Asaas.
-        external_reference: `${produto.id}:${usuario.id}`,
+        // O terceiro campo (correlacao) identifica essa tentativa de compra específica no
+        // historico_pedidos, pra o webhook saber qual linha atualizar.
+        external_reference: `${produto.id}:${usuario.id}:${correlacao}`,
         notification_url: `${origem}/api/mercadopago-webhook`,
         // O Mercado Pago sempre acrescenta seus próprios parâmetros (payment_id, status, etc.)
         // na URL de retorno, então as três apontam pro mesmo lugar -- é o App.jsx que decide
@@ -85,6 +89,14 @@ export default async function handler(req, res) {
     })
 
     const url = ehAmbienteTeste() ? preferencia.sandbox_init_point : preferencia.init_point
+
+    await registrarPedidoPendente(supabaseAdmin, {
+      correlacao,
+      userEmail: usuario.email,
+      productName: produto.name,
+      valor: produto.price,
+      gateway: 'mercadopago',
+    })
 
     res.status(200).json({ url })
   } catch (err) {

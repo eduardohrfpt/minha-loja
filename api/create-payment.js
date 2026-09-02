@@ -1,5 +1,6 @@
 import { asaasFetch, obterOuCriarCliente } from './_lib/asaas.js'
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { gerarCorrelacao, registrarPedidoPendente } from './_lib/historicoPedidos.js'
 
 function limparDocumento(valor) {
   return (valor || '').replace(/\D/g, '')
@@ -60,6 +61,8 @@ export default async function handler(req, res) {
     return
   }
 
+  const correlacao = gerarCorrelacao()
+
   try {
     const clienteId = await obterOuCriarCliente({
       nome: usuario.user_metadata?.nome || usuario.email,
@@ -80,9 +83,18 @@ export default async function handler(req, res) {
         dueDate: dataVencimento,
         description: produto.name,
         // Formato compacto (não JSON): o Asaas limita externalReference a 100 caracteres,
-        // e "{"product_id":"<uuid>","user_id":"<uuid>"}" já passa disso.
-        externalReference: `${produto.id}:${usuario.id}`,
+        // e um JSON com os três dados já passa disso. O terceiro campo (correlacao)
+        // identifica essa tentativa de compra no historico_pedidos.
+        externalReference: `${produto.id}:${usuario.id}:${correlacao}`,
       }),
+    })
+
+    await registrarPedidoPendente(supabaseAdmin, {
+      correlacao,
+      userEmail: usuario.email,
+      productName: produto.name,
+      valor: produto.price,
+      gateway: 'asaas',
     })
 
     res.status(200).json({ url: cobranca.invoiceUrl })

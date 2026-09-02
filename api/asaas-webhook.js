@@ -1,8 +1,12 @@
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { atualizarHistoricoPedido } from './_lib/historicoPedidos.js'
 
 // PAYMENT_CONFIRMED: pagamento confirmado (ex: cartão aprovado na hora).
 // PAYMENT_RECEIVED: dinheiro efetivamente recebido (ex: Pix/boleto compensado).
 const EVENTOS_PAGAMENTO_CONFIRMADO = ['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED']
+
+// PAYMENT_OVERDUE: Pix/boleto venceu sem ser pago. PAYMENT_DELETED: cobrança removida.
+const EVENTOS_PAGAMENTO_FALHOU = ['PAYMENT_OVERDUE', 'PAYMENT_DELETED']
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,22 +25,27 @@ export default async function handler(req, res) {
 
   const { event, payment } = req.body || {}
 
-  if (!EVENTOS_PAGAMENTO_CONFIRMADO.includes(event) || !payment) {
+  if (!payment || (!EVENTOS_PAGAMENTO_CONFIRMADO.includes(event) && !EVENTOS_PAGAMENTO_FALHOU.includes(event))) {
     res.status(200).json({ recebido: true })
     return
   }
 
-  // Formato compacto "productId:userId" (ver api/create-payment.js) -- o Asaas limita
-  // externalReference a 100 caracteres, o que não cabe num JSON com dois uuids.
-  const [productId, userId] = (payment.externalReference || '').split(':')
+  // Formato compacto "productId:userId:correlacao" (ver api/create-payment.js) -- o Asaas
+  // limita externalReference a 100 caracteres, o que não cabe num JSON com esses dados.
+  const [productId, userId, correlacao] = (payment.externalReference || '').split(':')
+  const supabaseAdmin = criarSupabaseAdmin()
+
+  if (EVENTOS_PAGAMENTO_FALHOU.includes(event)) {
+    await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'falhou', payment_id: payment.id })
+    res.status(200).json({ recebido: true })
+    return
+  }
 
   if (!productId || !userId) {
     console.error('Cobrança do Asaas sem externalReference esperada:', payment.id)
     res.status(200).json({ recebido: true })
     return
   }
-
-  const supabaseAdmin = criarSupabaseAdmin()
 
   const { data, error } = await supabaseAdmin.rpc('resgatar_codigo_servidor', {
     p_product_id: productId,
@@ -51,6 +60,9 @@ export default async function handler(req, res) {
     // funcione para Pix, cartão e boleto ao mesmo tempo, então o reembolso aqui precisa ser
     // feito manualmente pelo painel do Asaas.
     console.error(`Falha ao entregar código do pagamento ${payment.id}:`, error.message)
+    // Pagamento aprovado, mas sem estoque no momento da entrega -- fica sem código no
+    // histórico, o que sinaliza pro admin que esse caso precisa de atenção manual.
+    await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'aprovado', payment_id: payment.id })
     res.status(200).json({ recebido: true })
     return
   }
@@ -60,6 +72,8 @@ export default async function handler(req, res) {
     res.status(200).json({ recebido: true })
     return
   }
+
+  await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'aprovado', payment_id: payment.id, codigo })
 
   const [{ data: userData }, { data: produto }] = await Promise.all([
     supabaseAdmin.auth.admin.getUserById(userId),

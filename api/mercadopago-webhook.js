@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import { mercadoPagoFetch } from './_lib/mercadopago.js'
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { atualizarHistoricoPedido } from './_lib/historicoPedidos.js'
 
 // Camada extra opcional: se MERCADOPAGO_WEBHOOK_SECRET estiver configurado (Painel do Mercado
 // Pago > Sua aplicação > Webhooks > Chave secreta), valida a assinatura do header x-signature.
@@ -57,20 +58,25 @@ export default async function handler(req, res) {
     return
   }
 
-  if (pagamento.status !== 'approved') {
+  const [productId, userId, correlacao] = (pagamento.external_reference || '').split(':')
+  const supabaseAdmin = criarSupabaseAdmin()
+
+  if (pagamento.status === 'rejected' || pagamento.status === 'cancelled') {
+    await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'falhou', payment_id: String(paymentId) })
     res.status(200).json({ recebido: true })
     return
   }
 
-  const [productId, userId] = (pagamento.external_reference || '').split(':')
+  if (pagamento.status !== 'approved') {
+    res.status(200).json({ recebido: true })
+    return
+  }
 
   if (!productId || !userId) {
     console.error('Pagamento do Mercado Pago sem external_reference esperada:', paymentId)
     res.status(200).json({ recebido: true })
     return
   }
-
-  const supabaseAdmin = criarSupabaseAdmin()
 
   const { data, error } = await supabaseAdmin.rpc('resgatar_codigo_servidor', {
     p_product_id: productId,
@@ -81,6 +87,9 @@ export default async function handler(req, res) {
 
   if (error) {
     console.error(`Falha ao entregar código do pagamento ${paymentId}:`, error.message)
+    // Pagamento aprovado, mas sem estoque no momento da entrega -- fica sem código no
+    // histórico, o que sinaliza pro admin que esse caso precisa de atenção manual.
+    await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'aprovado', payment_id: String(paymentId) })
     res.status(200).json({ recebido: true })
     return
   }
@@ -90,6 +99,12 @@ export default async function handler(req, res) {
     res.status(200).json({ recebido: true })
     return
   }
+
+  await atualizarHistoricoPedido(supabaseAdmin, correlacao, {
+    status: 'aprovado',
+    payment_id: String(paymentId),
+    codigo,
+  })
 
   const [{ data: userData }, { data: produto }] = await Promise.all([
     supabaseAdmin.auth.admin.getUserById(userId),
