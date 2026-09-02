@@ -29,6 +29,7 @@ function Header() {
               {link.label}
             </button>
           ))}
+          {!usuario && <button onClick={() => setModalAberto('cadastro')}>Criar conta</button>}
         </nav>
 
         <div className="cabecalho-acoes">
@@ -43,14 +44,9 @@ function Header() {
               </button>
             </>
           ) : (
-            <>
-              <button className="botao-fantasma" onClick={() => setModalAberto('login')}>
-                Entrar
-              </button>
-              <button className="botao-primario" onClick={() => setModalAberto('cadastro')}>
-                Criar conta
-              </button>
-            </>
+            <button className="botao-fantasma" onClick={() => setModalAberto('login')}>
+              Entrar
+            </button>
           )}
         </div>
       </div>
