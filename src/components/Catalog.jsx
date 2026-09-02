@@ -324,9 +324,8 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
           <div className="modal-status-pagamento" onClick={(e) => e.stopPropagation()}>
             <h2>Antes de continuar</h2>
             <p className="detalhe-texto-livre">
-              Você vai ser levado para o checkout do Mercado Pago. <strong>Depois de pagar, clique em "Voltar para a
-              loja"</strong> na própria tela do Mercado Pago para ver seu código na hora, sem precisar procurar nada.
-              Se preferir, o código também será enviado para o seu e-mail.
+              Após o pagamento, clique em <strong>"Voltar"</strong> na parte de baixo da tela para ver o código da
+              sua compra na hora. Se preferir, também enviaremos por e-mail.
             </p>
             <div className="acoes-formulario">
               <button type="button" onClick={() => setProdutoConfirmando(null)}>
