@@ -114,7 +114,7 @@ export default async function handler(req, res) {
   if (userData?.user?.email) {
     const origem = `https://${req.headers.host}`
     try {
-      await fetch(`${origem}/api/send-order-email`, {
+      const respostaEmail = await fetch(`${origem}/api/send-order-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -124,6 +124,12 @@ export default async function handler(req, res) {
           codigo,
         }),
       })
+      // fetch só rejeita em falha de rede -- um 4xx/5xx do Resend (ex: domínio de teste
+      // resend.dev só pode mandar pro próprio e-mail da conta) passava batido sem log nenhum.
+      if (!respostaEmail.ok) {
+        const detalhe = await respostaEmail.text()
+        console.error(`send-order-email retornou ${respostaEmail.status} para ${userData.user.email}:`, detalhe)
+      }
     } catch (err) {
       console.error('Falha ao enviar e-mail de confirmação:', err)
     }
