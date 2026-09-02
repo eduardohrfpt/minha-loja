@@ -3,17 +3,19 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { formatarPreco } from '../utils'
+import CodigoDetalheModal from './CodigoDetalheModal'
 
 function MyOrdersModal({ onFechar }) {
   const { usuario } = useAuth()
   const [pedidos, setPedidos] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null)
 
   useEffect(() => {
     async function carregar() {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, created_at, status, products(name, brand, image, price), codigos_produto(codigo)')
+        .select('id, created_at, status, products(name, brand, image, price, guia_uso_codigo), codigos_produto(codigo)')
         .eq('user_id', usuario.id)
         .order('created_at', { ascending: false })
 
@@ -36,30 +38,54 @@ function MyOrdersModal({ onFechar }) {
         {!carregando && pedidos.length === 0 && <p className="vazio">Você ainda não fez nenhuma compra.</p>}
 
         <div className="estoque-lista">
-          {pedidos.map((pedido) => (
-            <div className="pedido-item" key={pedido.id}>
-              <div className="pedido-item-topo">
-                <span className="icone-marca">{pedido.products?.image}</span>
-                <div>
-                  <strong>{pedido.products?.name}</strong>
-                  <span className="card-marca">{pedido.products?.brand}</span>
+          {pedidos.map((pedido) => {
+            const codigo = pedido.codigos_produto?.[0]?.codigo
+            return (
+              <div
+                className={`pedido-item ${codigo ? 'pedido-item-clicavel' : ''}`}
+                key={pedido.id}
+                {...(codigo && {
+                  role: 'button',
+                  tabIndex: 0,
+                  onClick: () => setPedidoSelecionado(pedido),
+                  onKeyDown: (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setPedidoSelecionado(pedido)
+                    }
+                  },
+                })}
+              >
+                <div className="pedido-item-topo">
+                  <span className="icone-marca">{pedido.products?.image}</span>
+                  <div>
+                    <strong>{pedido.products?.name}</strong>
+                    <span className="card-marca">{pedido.products?.brand}</span>
+                  </div>
+                  <span className="pedido-preco">{formatarPreco(pedido.products?.price)}</span>
                 </div>
-                <span className="pedido-preco">{formatarPreco(pedido.products?.price)}</span>
+                <div className="pedido-item-detalhe">
+                  <span>{new Date(pedido.created_at).toLocaleString('pt-BR')}</span>
+                  {codigo && <code>{codigo}</code>}
+                </div>
               </div>
-              <div className="pedido-item-detalhe">
-                <span>{new Date(pedido.created_at).toLocaleString('pt-BR')}</span>
-                {pedido.codigos_produto?.[0]?.codigo && (
-                  <code>{pedido.codigos_produto[0].codigo}</code>
-                )}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="acoes-formulario">
           <button onClick={onFechar}>Fechar</button>
         </div>
       </div>
+
+      {pedidoSelecionado && (
+        <CodigoDetalheModal
+          produtoNome={pedidoSelecionado.products?.name}
+          codigo={pedidoSelecionado.codigos_produto?.[0]?.codigo}
+          guiaUso={pedidoSelecionado.products?.guia_uso_codigo}
+          onFechar={() => setPedidoSelecionado(null)}
+        />
+      )}
     </div>,
     document.body,
   )

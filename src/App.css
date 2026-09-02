@@ -1244,6 +1244,17 @@
   gap: 8px;
 }
 
+.pedido-item-clicavel {
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pedido-item-clicavel:hover,
+.pedido-item-clicavel:focus-visible {
+  border-color: var(--verde);
+  background: var(--bg-alt);
+}
+
 .pedido-item-topo {
   display: flex;
   align-items: center;
