@@ -228,7 +228,9 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
         </div>
       )}
 
-      {pedidosAbertos && <PedidosModal onFechar={() => setPedidosAbertos(false)} />}
+      {pedidosAbertos && (
+        <PedidosModal produtos={produtos} estoque={estoque} onFechar={() => setPedidosAbertos(false)} />
+      )}
 
       <div className="grade">
         {produtos.map((produto) => {
