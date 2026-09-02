@@ -1270,19 +1270,35 @@
 .modal-status-pagamento {
   background: #fff;
   border-radius: var(--raio);
-  padding: 32px 28px;
+  padding: 40px 36px;
   width: 100%;
-  max-width: 440px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 18px;
   text-align: center;
 }
 
 .modal-status-pagamento h2 {
   color: var(--titulo);
+  font-size: 22px;
   margin: 0;
+}
+
+.modal-status-pagamento .detalhe-texto-livre {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.modal-status-pagamento .acoes-formulario {
+  margin-top: 10px;
+  gap: 12px;
+}
+
+.modal-status-pagamento .acoes-formulario button {
+  padding: 11px 22px;
+  font-size: 15px;
 }
 
 .spinner-pagamento {
