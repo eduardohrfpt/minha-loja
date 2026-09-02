@@ -129,14 +129,11 @@
 
 /* Hero */
 
-.hero-fundo {
-  background: var(--bg-alt);
-}
-
 .hero {
   max-width: 1180px;
   margin: 0 auto;
   padding: 128px 24px 80px;
+  background: var(--bg-alt);
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
@@ -144,7 +141,8 @@
 }
 
 .banner-destaque {
-  display: inline-block;
+  display: block;
+  width: fit-content;
   font-size: 16px;
   font-weight: 700;
   color: var(--verde-escuro);
@@ -152,7 +150,7 @@
   border: 1px solid rgba(16, 185, 129, 0.35);
   padding: 12px 22px;
   border-radius: var(--raio-sm);
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
 }
 
 .hero h1 {
