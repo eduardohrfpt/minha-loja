@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'HRKeys <onboarding@resend.dev>',
+        from: 'HRKeys <contato@hrkeys.com.br>',
         to: [email],
         subject: `Sua compra: ${produtoNome}`,
         html: `
