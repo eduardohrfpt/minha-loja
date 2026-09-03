@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { formatarPreco } from '../utils'
 import { IconCheck, IconShield, IconLock, IconHeadset } from './icons'
+import IconeProduto from './IconeProduto'
 
 const ONDE_ATIVA = 'Na sua própria conta'
 const TIPO_LINK = 'Link oficial, resgatado no site da própria plataforma'
@@ -34,7 +35,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
     <div className="overlay" onClick={onFechar}>
       <div className="modal-detalhes-completo" onClick={(e) => e.stopPropagation()}>
         <div className="detalhe-header">
-          <span className="icone-marca icone-marca-grande">{produto.image}</span>
+          <IconeProduto produto={produto} className="icone-marca icone-marca-grande" />
           <div>
             <h3>{produto.name}</h3>
             <span className="card-marca">{produto.brand}</span>

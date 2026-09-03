@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { formatarPreco } from '../utils'
 import CodigoDetalheModal from './CodigoDetalheModal'
+import IconeProduto from './IconeProduto'
 
 function MyOrdersModal({ onFechar }) {
   const { usuario } = useAuth()
@@ -15,7 +16,9 @@ function MyOrdersModal({ onFechar }) {
     async function carregar() {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, created_at, status, products(name, brand, image, price, guia_uso_codigo), codigos_produto(codigo)')
+        .select(
+          'id, created_at, status, products(name, brand, image, image_url, price, guia_uso_codigo), codigos_produto(codigo)',
+        )
         .eq('user_id', usuario.id)
         .order('created_at', { ascending: false })
 
@@ -57,7 +60,7 @@ function MyOrdersModal({ onFechar }) {
                 })}
               >
                 <div className="pedido-item-topo">
-                  <span className="icone-marca">{pedido.products?.image}</span>
+                  <IconeProduto produto={pedido.products} className="icone-marca" />
                   <div>
                     <strong>{pedido.products?.name}</strong>
                     <span className="card-marca">{pedido.products?.brand}</span>

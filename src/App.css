@@ -232,6 +232,13 @@
   font-size: 26px;
 }
 
+.hero-card-icone.icone-marca-imagem {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 .hero-card-info {
   display: flex;
   flex-direction: column;
@@ -480,6 +487,10 @@
   height: 64px;
   font-size: 32px;
   margin: 0 auto;
+}
+
+.icone-marca-imagem {
+  object-fit: cover;
 }
 
 .card h3 {

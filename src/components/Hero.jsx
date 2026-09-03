@@ -1,4 +1,5 @@
 import { formatarPreco, rolarPara } from '../utils'
+import IconeProduto from './IconeProduto'
 
 function Hero({ produtosDestaque }) {
   return (
@@ -23,7 +24,7 @@ function Hero({ produtosDestaque }) {
           <span className="hero-card-selo">Economize até 90%</span>
           {produtosDestaque.map((produto) => (
             <div className="hero-card-item" key={produto.id}>
-              <span className="hero-card-icone">{produto.image}</span>
+              <IconeProduto produto={produto} className="hero-card-icone" />
               <div className="hero-card-info">
                 <strong>{produto.name}</strong>
                 <span className="hero-card-marca">{produto.brand}</span>

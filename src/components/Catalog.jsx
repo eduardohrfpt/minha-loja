@@ -5,11 +5,13 @@ import { useAuth } from '../context/AuthContext'
 import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
+import IconeProduto from './IconeProduto'
 
 const formVazio = {
   name: '',
   brand: '',
   image: '✨',
+  image_url: '',
   badges: '',
   available: true,
   delivery_type: 'imediata',
@@ -73,6 +75,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       name: produto.name,
       brand: produto.brand,
       image: produto.image,
+      image_url: produto.image_url || '',
       badges: (produto.badges || []).join(', '),
       available: produto.available,
       delivery_type: produto.delivery_type,
@@ -123,6 +126,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       name: form.name,
       brand: form.brand,
       image: form.image || '🛒',
+      image_url: form.image_url.trim() || null,
       badges: form.badges
         ? form.badges.split(',').map((b) => b.trim()).filter(Boolean)
         : [],
@@ -251,7 +255,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
                 </div>
               )}
               <div className="card-topo">
-                <span className="icone-marca">{produto.image}</span>
+                <IconeProduto produto={produto} className="icone-marca" />
                 <div>
                   <h3>{produto.name}</h3>
                   <span className="card-marca">{produto.brand}</span>
@@ -349,6 +353,15 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
             <label>
               Emoji/ícone
               <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="🤖" />
+            </label>
+            <label>
+              URL da imagem (opcional, substitui o emoji)
+              <input
+                type="url"
+                value={form.image_url}
+                onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                placeholder="https://i.imgur.com/exemplo.png"
+              />
             </label>
             <label>
               Nome
