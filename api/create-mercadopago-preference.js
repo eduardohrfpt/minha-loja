@@ -68,9 +68,8 @@ export default async function handler(req, res) {
           },
         ],
         payer: { email: usuario.email },
-        // Formato compacto (não JSON), consistente com o que já é usado na integração Asaas.
-        // O terceiro campo (correlacao) identifica essa tentativa de compra específica no
-        // historico_pedidos, pra o webhook saber qual linha atualizar.
+        // Formato compacto (não JSON). O terceiro campo (correlacao) identifica essa tentativa
+        // de compra específica no historico_pedidos, pra o webhook saber qual linha atualizar.
         external_reference: `${produto.id}:${usuario.id}:${correlacao}`,
         notification_url: `${origem}/api/mercadopago-webhook`,
         // O Mercado Pago sempre acrescenta seus próprios parâmetros (payment_id, status, etc.)

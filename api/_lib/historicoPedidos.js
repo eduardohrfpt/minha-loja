@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 
-// Token curto (não um uuid) porque ele viaja embutido no external_reference/externalReference
-// enviado pro gateway de pagamento, e o Asaas limita esse campo a 100 caracteres.
+// Token curto (não um uuid) porque ele viaja embutido no external_reference enviado ao
+// Mercado Pago junto com o id do produto e do usuário.
 export function gerarCorrelacao() {
   return crypto.randomBytes(8).toString('hex')
 }
