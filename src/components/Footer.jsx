@@ -27,10 +27,7 @@ function Footer() {
               <span className="marca-icone">HR</span>
               <span className="marca-texto">HRKeys</span>
             </span>
-            <p>
-              Produtos digitais com entrega automática. Você paga, o sistema compra e o acesso
-              chega na hora — sem fila e sem intermediário.
-            </p>
+            <p>Assinaturas e licenças digitais originais. Simples assim: pagou, recebeu.</p>
           </div>
 
           <div>
