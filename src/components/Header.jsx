@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { rolarPara } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import AuthModal from './AuthModal'
@@ -14,18 +15,30 @@ function Header() {
   const { usuario, sair } = useAuth()
   const [modalAberto, setModalAberto] = useState(null)
   const [minhasComprasAberto, setMinhasComprasAberto] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // As seções (Produtos, Como funciona, Vantagens) só existem na Home. Fora dela, "rolar até"
+  // não acha o elemento e não faz nada -- então primeiro volta pra Home.
+  function irParaSecao(id) {
+    if (location.pathname !== '/') {
+      navigate('/')
+      return
+    }
+    rolarPara(id)
+  }
 
   return (
     <header className="cabecalho">
       <div className="cabecalho-conteudo">
-        <button className="marca" onClick={() => rolarPara('topo')}>
-          <span className="marca-icone">EH</span>
-          <span className="marca-texto">EH Digital</span>
+        <button className="marca" onClick={() => irParaSecao('topo')}>
+          <span className="marca-icone">HR</span>
+          <span className="marca-texto">HRKeys</span>
         </button>
 
         <nav className="nav-desktop">
           {linksNav.map((link) => (
-            <button key={link.id} onClick={() => rolarPara(link.id)}>
+            <button key={link.id} onClick={() => irParaSecao(link.id)}>
               {link.label}
             </button>
           ))}

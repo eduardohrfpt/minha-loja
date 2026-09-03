@@ -19,14 +19,14 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'EH Digital <onboarding@resend.dev>',
+        from: 'HRKeys <onboarding@resend.dev>',
         to: [email],
         subject: `Sua compra: ${produtoNome}`,
         html: `
           <p>Olá${nome ? ' ' + nome : ''},</p>
           <p>Sua compra de <strong>${produtoNome}</strong> foi confirmada.</p>
           <p>Seu código: <strong>${codigo}</strong></p>
-          <p>Obrigado por comprar com a EH Digital.</p>
+          <p>Obrigado por comprar com a HRKeys.</p>
         `,
       }),
     })

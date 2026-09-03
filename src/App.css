@@ -1137,6 +1137,11 @@
 /* Rodapé */
 
 .rodape {
+  background: var(--azul);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.rodape-conteudo {
   max-width: 1180px;
   margin: 0 auto;
   padding: 64px 24px 32px;
@@ -1146,19 +1151,25 @@
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
   gap: 32px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+}
+
+.rodape .marca-texto {
+  color: #fff;
 }
 
 .rodape-marca p {
   margin-top: 12px;
   font-size: 14px;
-  color: var(--texto-suave);
-  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 36ch;
+  line-height: 1.6;
 }
 
 .rodape h4 {
   font-size: 14px;
   margin-bottom: 14px;
+  color: #fff;
 }
 
 .rodape-lista {
@@ -1169,7 +1180,7 @@
   flex-direction: column;
   gap: 10px;
   font-size: 14px;
-  color: var(--texto-suave);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .rodape-lista li {
@@ -1183,22 +1194,50 @@
   flex-shrink: 0;
 }
 
+.rodape-lista a,
 .rodape-lista button {
   background: none;
   border: none;
-  color: var(--texto-suave);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 14px;
   padding: 0;
+  text-decoration: none;
 }
+.rodape-lista a:hover,
 .rodape-lista button:hover {
-  color: var(--azul);
+  color: #fff;
+}
+
+.rodape-selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 24px;
+}
+
+.rodape-selo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rodape-selo svg {
+  width: 18px;
+  height: 18px;
+  color: var(--verde);
+  flex-shrink: 0;
 }
 
 .rodape-copyright {
-  border-top: 1px solid var(--borda);
-  padding-top: 24px;
-  font-size: 13px;
-  color: var(--texto-suave);
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
   text-align: center;
 }
 
@@ -1507,6 +1546,8 @@
   border-bottom: 2px solid transparent;
   border-radius: 0;
   margin-bottom: -1px;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .aba-botao:hover {
@@ -1692,4 +1733,74 @@
 .status-badge-erro {
   background: rgba(220, 38, 38, 0.12);
   color: #dc2626;
+}
+
+/* Página de políticas */
+
+.pagina-politicas {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 140px 24px 100px;
+  min-height: 60vh;
+}
+
+.politicas-cabecalho {
+  margin-bottom: 32px;
+}
+
+.politicas-voltar {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul);
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+.politicas-voltar:hover {
+  color: var(--verde-escuro);
+}
+
+.politicas-cabecalho h1 {
+  font-size: 32px;
+  color: var(--titulo);
+}
+
+.politicas-abas {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--borda);
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.politicas-conteudo h2 {
+  font-size: 24px;
+  color: var(--titulo);
+  margin-bottom: 24px;
+}
+
+.politicas-secao {
+  margin-bottom: 28px;
+}
+
+.politicas-secao h3 {
+  font-size: 16px;
+  color: var(--verde-escuro);
+  margin-bottom: 8px;
+}
+
+.politicas-secao p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--texto);
+  margin-bottom: 10px;
+}
+.politicas-secao p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .pagina-politicas {
+    padding-top: 116px;
+  }
 }

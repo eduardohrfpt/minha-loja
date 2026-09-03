@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { supabase } from './lib/supabaseClient'
 import Header from './components/Header'
@@ -12,6 +13,7 @@ import CtaFinal from './components/CtaFinal'
 import Footer from './components/Footer'
 import AdminToggle from './components/AdminToggle'
 import PagamentoStatusModal from './components/PagamentoStatusModal'
+import PoliticasPage from './components/PoliticasPage'
 import './App.css'
 
 // Depois que o Mercado Pago aprova um pagamento, o webhook (server-side) demora um pouco pra
@@ -120,18 +122,28 @@ function App() {
     <AuthProvider>
       <div className="app">
         <Header />
-        <Hero produtosDestaque={produtos.slice(0, 4)} />
-        <TrustBar />
-        <HowItWorks />
-        <Catalog
-          produtos={produtos}
-          estoque={estoque}
-          recarregarProdutos={carregarProdutos}
-          modoAdmin={modoAdminAtivo}
-        />
-        <WhyBuy />
-        <Faq />
-        <CtaFinal />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero produtosDestaque={produtos.slice(0, 4)} />
+                <TrustBar />
+                <HowItWorks />
+                <Catalog
+                  produtos={produtos}
+                  estoque={estoque}
+                  recarregarProdutos={carregarProdutos}
+                  modoAdmin={modoAdminAtivo}
+                />
+                <WhyBuy />
+                <Faq />
+                <CtaFinal />
+              </>
+            }
+          />
+          <Route path="/politicas/:aba" element={<PoliticasPage />} />
+        </Routes>
         <Footer />
         <AdminToggle modoAdminAtivo={modoAdminAtivo} setModoAdminAtivo={setModoAdminAtivo} />
         {statusPagamento && (
