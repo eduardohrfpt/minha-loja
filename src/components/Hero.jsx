@@ -12,10 +12,11 @@ function Hero({ produtosDestaque }) {
         <div className="hero-texto">
           <span className="banner-destaque">Economize até 90% em assinaturas premium</span>
           <h1>Assinaturas premium por um preço muito mais baixo.</h1>
-          <p className="hero-destaque">Acesso legítimo às plataformas originais, com um desconto de até 90%. Aproveite!</p>
+          <p className="hero-destaque">Acesso legítimo às plataformas originais, com desconto de até 90%.</p>
           <p className="hero-subtitulo">
-            Negociamos condições especiais com fornecedores autorizados para garantir os melhores
-            preços. O produto é 100% original — a única diferença é que aqui você paga muito menos.
+            Compramos as licenças direto na fonte e repassamos a diferença pra você. O produto é
+            100% original — a única diferença é o preço. Entrega rápida após a confirmação do
+            pagamento.
           </p>
           <div className="hero-acoes">
             <button className="botao-primario botao-grande" onClick={() => rolarPara('produtos')}>
