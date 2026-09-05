@@ -566,13 +566,6 @@
   flex-shrink: 0;
 }
 
-.icone-marca-grande {
-  width: 64px;
-  height: 64px;
-  font-size: 32px;
-  margin: 0 auto;
-}
-
 .icone-marca-imagem {
   object-fit: cover;
 }
@@ -692,30 +685,120 @@
 .modal-detalhes-completo {
   background: #fff;
   border-radius: var(--raio);
-  padding: 28px;
   width: 100%;
   max-width: 560px;
-  max-height: 88vh;
-  overflow-y: auto;
+  max-height: 90vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 22px;
   text-align: left;
 }
 
-.detalhe-header {
+.detalhe-scroll {
+  overflow-y: auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detalhe-imagem-grande {
+  width: clamp(180px, 60vw, 320px);
+  height: clamp(180px, 60vw, 320px);
+  margin: 0 auto;
+  border-radius: var(--raio);
+  overflow: hidden;
+  background: var(--bg-alt);
+  flex-shrink: 0;
+}
+
+.detalhe-imagem-conteudo {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: min(45vw, 140px);
+  object-fit: cover;
+}
+
+.detalhe-titulo-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.detalhe-titulo-bloco h3 {
+  font-size: 20px;
+}
+
+.detalhe-preco-linha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.detalhe-icones-rapidos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.icone-rapido {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
+  background: var(--bg-alt);
+  border-radius: var(--raio-sm);
+  padding: 10px 12px;
 }
 
-.detalhe-tagline {
-  font-size: 14px;
+.icone-rapido-svg {
+  width: 20px;
+  height: 20px;
+  color: var(--azul);
+  flex-shrink: 0;
+}
+
+.icone-rapido div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.icone-rapido strong {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
   color: var(--texto-suave);
-  margin-top: 4px;
 }
 
-.detalhe-beneficios {
+.icone-rapido span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--titulo);
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 560px) {
+  .detalhe-icones-rapidos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detalhe-descricao-curta {
+  font-size: 14px;
+  color: var(--texto);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.detalhe-lista-check {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -724,7 +807,7 @@
   gap: 8px;
 }
 
-.detalhe-beneficios li {
+.detalhe-lista-check li {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -739,29 +822,6 @@
   margin-top: 1px;
 }
 
-.caixa-preco {
-  background: var(--bg-alt);
-  border-radius: var(--raio-sm);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-}
-
-.caixa-preco-linha {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.caixa-preco-economia {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--verde-escuro);
-}
-
 .badge-estoque {
   font-size: 12px;
   font-weight: 600;
@@ -772,42 +832,8 @@
   border-radius: 999px;
 }
 
-.grid-info {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.info-card {
-  background: var(--bg-alt);
-  border-radius: var(--raio-sm);
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
-}
-
-.info-card-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--texto-suave);
-}
-
-.detalhe-lista {
-  margin: 0;
-  padding-left: 20px;
-  font-size: 14px;
-  color: var(--texto);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .detalhe-lista-numerada {
-  margin: 0;
+  margin: 10px 0 0;
   padding-left: 20px;
   font-size: 14px;
   color: var(--texto);
@@ -822,6 +848,10 @@
   border-radius: var(--raio-sm);
   padding: 12px 14px;
   font-size: 13px;
+}
+
+.aviso-prazo-inline {
+  margin-top: 10px;
 }
 
 .ficha-tecnica {
@@ -875,14 +905,10 @@
   color: var(--texto-suave);
 }
 
-.resumo-final {
+.detalhe-aviso-curto {
   text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--titulo);
   border-top: 1px dashed var(--borda);
-  border-bottom: 1px dashed var(--borda);
-  padding: 14px 0;
+  padding-top: 14px;
 }
 
 .detalhe-rodape {
@@ -891,8 +917,9 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+  flex-shrink: 0;
   border-top: 1px solid var(--borda);
-  padding-top: 16px;
+  padding: 16px 28px;
 }
 
 .detalhe-total {
@@ -906,12 +933,6 @@
 
 .detalhe-rodape .acoes-formulario {
   margin-top: 0;
-}
-
-@media (max-width: 560px) {
-  .grid-info {
-    grid-template-columns: 1fr;
-  }
 }
 
 .detalhe-bloco {
