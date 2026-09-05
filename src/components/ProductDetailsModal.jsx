@@ -16,24 +16,23 @@ const SELOS_CONFIANCA = [
 const AVISO_CURTO =
   'Ao ativar o código, você aceita os termos da plataforma original; a compra não pode ser trocada ou estornada após a ativação.'
 
+const ENTREGA_RESUMO = 'Até 10 min'
+const EXPLICACAO_ENTREGA =
+  'Nosso sistema realiza a entrega automaticamente. O prazo típico é de até 10 minutos após a confirmação do pagamento.'
+const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
+
 function ProductDetailsModal({ produto, onFechar, onComprar }) {
   if (!produto) return null
 
-  const entregaManual = produto.delivery_type === 'manual'
   const estoque = produto.estoqueReal ?? produto.estoque
   const itensIncluidos = Array.from(
     new Set([...(produto.beneficios || []), ...(produto.features || [])].map((item) => item.trim()).filter(Boolean)),
   )
   const descricaoCurta = produto.description || produto.resumo_final || produto.tagline
-  const passosCustom = produto.passos_ativacao?.length > 0 ? produto.passos_ativacao : null
-
-  const entregaResumo = entregaManual ? 'Até 15 min' : 'Automática'
-  const explicacaoEntrega = entregaManual
-    ? 'A entrega desse produto é feita manualmente pela nossa equipe, via Telegram ou e-mail, dentro do horário de atendimento da loja. O prazo típico é de até 10 a 15 minutos após a confirmação do pagamento; fora do horário de atendimento, é concluída assim que reabrirmos.'
-    : 'A entrega é automática: assim que o pagamento é aprovado, seu código de ativação aparece na tela e também é enviado por e-mail.'
-  const prazoEntregaFicha = entregaManual
-    ? 'Até 10-15 minutos após a aprovação, dentro do horário de atendimento'
-    : 'Automático, assim que o pagamento é aprovado'
+  const passosAtivacao = produto.instrucoes_ativacao
+    ?.split('\n')
+    .map((passo) => passo.trim())
+    .filter(Boolean)
 
   return createPortal(
     <div className="overlay" onClick={onFechar}>
@@ -63,7 +62,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
               <IconBolt className="icone-rapido-svg" />
               <div>
                 <strong>Entrega</strong>
-                <span>{entregaResumo}</span>
+                <span>{ENTREGA_RESUMO}</span>
               </div>
             </div>
             <div className="icone-rapido">
@@ -100,16 +99,20 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
 
           <div className="detalhe-bloco">
             <h4>Como funciona a entrega</h4>
-            <p className="detalhe-texto-livre">{explicacaoEntrega}</p>
+            <p className="detalhe-texto-livre">{EXPLICACAO_ENTREGA}</p>
             {produto.aviso_prazo && <p className="aviso-prazo aviso-prazo-inline">{produto.aviso_prazo}</p>}
-            {passosCustom && (
+          </div>
+
+          {passosAtivacao?.length > 0 && (
+            <div className="detalhe-bloco">
+              <h4>Como ativar</h4>
               <ol className="detalhe-lista-numerada">
-                {passosCustom.map((passo, indice) => (
+                {passosAtivacao.map((passo, indice) => (
                   <li key={indice}>{passo}</li>
                 ))}
               </ol>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="detalhe-bloco">
             <h4>Ficha técnica</h4>
@@ -129,7 +132,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
                 </tr>
                 <tr>
                   <th>Prazo de entrega</th>
-                  <td>{prazoEntregaFicha}</td>
+                  <td>{PRAZO_ENTREGA_FICHA}</td>
                 </tr>
                 <tr>
                   <th>Garantia</th>

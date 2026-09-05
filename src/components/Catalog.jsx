@@ -28,6 +28,7 @@ const formVazio = {
   guia_uso_codigo: [],
   aviso_prazo: '',
   resumo_final: '',
+  instrucoes_ativacao: '',
 }
 
 function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeholder }) {
@@ -107,6 +108,7 @@ function Catalog({
       guia_uso_codigo: produto.guia_uso_codigo || [],
       aviso_prazo: produto.aviso_prazo || '',
       resumo_final: produto.resumo_final || '',
+      instrucoes_ativacao: produto.instrucoes_ativacao || '',
     })
     setProdutoEditando(produto.id)
   }
@@ -161,6 +163,7 @@ function Catalog({
       guia_uso_codigo: form.guia_uso_codigo.map((item) => item.trim()).filter(Boolean),
       aviso_prazo: form.aviso_prazo,
       resumo_final: form.resumo_final,
+      instrucoes_ativacao: form.instrucoes_ativacao,
     }
 
     setSalvando(true)
@@ -520,6 +523,15 @@ function Catalog({
             <label>
               Frase resumo final (opcional)
               <input value={form.resumo_final} onChange={(e) => setForm({ ...form, resumo_final: e.target.value })} placeholder="Ex: A forma mais barata de ter o ChatGPT Plus" />
+            </label>
+            <label>
+              Instruções de ativação (passo a passo)
+              <textarea
+                rows={5}
+                value={form.instrucoes_ativacao}
+                onChange={(e) => setForm({ ...form, instrucoes_ativacao: e.target.value })}
+                placeholder={'Um passo por linha, ex:\nAcesse o link recebido\nFaça login com sua conta\nCole o código no campo de ativação'}
+              />
             </label>
 
             <div className="acoes-formulario">
