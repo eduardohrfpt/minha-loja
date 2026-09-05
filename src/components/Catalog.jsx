@@ -51,7 +51,15 @@ function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeho
   )
 }
 
-function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
+function Catalog({
+  produtos,
+  estoque,
+  recarregarProdutos,
+  modoAdmin,
+  lojaAberta = true,
+  mensagemLojaFechada,
+  recarregarConfiguracaoLoja,
+}) {
   const { usuario, isAdmin } = useAuth()
   const adminAtivo = modoAdmin && isAdmin
 
@@ -188,7 +196,21 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       alert('Você precisa entrar na sua conta para comprar. Clique em "Entrar" no topo da página.')
       return
     }
+    if (!lojaAberta) {
+      alert(mensagemLojaFechada || 'Fora do horário de atendimento.')
+      return
+    }
     setProdutoConfirmando(produto)
+  }
+
+  async function alternarLojaAberta() {
+    if (!adminAtivo) return
+    const { error } = await supabase.from('configuracoes_loja').update({ aberta: !lojaAberta }).eq('id', 1)
+    if (error) {
+      alert(`Erro ao atualizar horário de funcionamento: ${error.message}`)
+      return
+    }
+    recarregarConfiguracaoLoja?.()
   }
 
   async function iniciarCheckout() {
@@ -229,6 +251,8 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
         <p>Todas as assinaturas disponíveis, com desconto já aplicado.</p>
       </div>
 
+      {!lojaAberta && <div className="aviso-loja-fechada">{mensagemLojaFechada}</div>}
+
       <div className="busca-catalogo">
         <IconSearch className="busca-catalogo-icone" />
         <input
@@ -241,6 +265,12 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
 
       {adminAtivo && (
         <div className="painel-admin">
+          <button
+            className={`botao-secundario botao-loja-status ${lojaAberta ? 'aberta' : 'fechada'}`}
+            onClick={alternarLojaAberta}
+          >
+            Loja: {lojaAberta ? 'Aberta' : 'Fechada'}
+          </button>
           <button className="botao-secundario" onClick={() => setPedidosAbertos(true)}>
             Pedidos
           </button>
@@ -306,10 +336,10 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
                 </button>
                 <button
                   className="botao-primario"
-                  disabled={!disponivelReal || comprando === produto.id}
+                  disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
                   onClick={() => comprarAgora(produto)}
                 >
-                  {comprando === produto.id ? 'Redirecionando...' : 'Comprar agora'}
+                  {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
                 </button>
               </div>
 

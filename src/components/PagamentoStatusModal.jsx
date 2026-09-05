@@ -1,6 +1,27 @@
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, onFechar }) {
+function formatarTempo(ms) {
+  const totalSegundos = Math.max(0, Math.floor(ms / 1000))
+  const minutos = Math.floor(totalSegundos / 60)
+  const segundos = totalSegundos % 60
+  return `${minutos}:${String(segundos).padStart(2, '0')}`
+}
+
+function Cronometro({ prazoLimite }) {
+  const [restante, setRestante] = useState(() => prazoLimite - Date.now())
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setRestante(prazoLimite - Date.now())
+    }, 1000)
+    return () => clearInterval(intervalo)
+  }, [prazoLimite])
+
+  return <div className="cronometro-entrega">{formatarTempo(restante)}</div>
+}
+
+function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimite, onFechar }) {
   const podeFechar = estado !== 'confirmando'
 
   return createPortal(
@@ -14,6 +35,27 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, onFechar }
               Isso pode levar alguns segundos. Se você pagou por Pix, aguarde aqui mesmo — assim que a confirmação
               chegar, mostramos seu código automaticamente.
             </p>
+          </>
+        )}
+
+        {estado === 'preparando' && (
+          <>
+            <span className="status-icone status-icone-ok" aria-hidden="true">
+              ✓
+            </span>
+            <h2>Pedido confirmado!</h2>
+            {produtoNome && <p className="detalhe-texto-livre">{produtoNome}</p>}
+            <p className="detalhe-texto-livre">Sua entrega será feita em até 10 minutos.</p>
+            {prazoLimite && <Cronometro prazoLimite={prazoLimite} />}
+            <p className="detalhe-texto-livre detalhe-texto-pequeno">
+              Você pode fechar esta tela: assim que a chave estiver pronta, enviamos por e-mail e ela também aparece
+              em "Minhas compras".
+            </p>
+            <div className="acoes-formulario">
+              <button className="botao-primario" onClick={onFechar}>
+                Fechar
+              </button>
+            </div>
           </>
         )}
 
@@ -52,10 +94,10 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, onFechar }
 
         {estado === 'expirado' && (
           <>
-            <h2>Ainda estamos confirmando seu pagamento</h2>
+            <h2>Sua entrega está sendo preparada</h2>
             <p className="detalhe-texto-livre">
-              Pagamentos via Pix às vezes demoram um pouco mais para compensar. Assim que for aprovado, enviaremos o
-              código por e-mail e ele também vai aparecer em "Minhas compras".
+              Está levando um pouco mais que o esperado. Assim que a chave estiver pronta, enviaremos por e-mail e
+              ela também vai aparecer em "Minhas compras".
             </p>
             <div className="acoes-formulario">
               <button className="botao-primario" onClick={onFechar}>

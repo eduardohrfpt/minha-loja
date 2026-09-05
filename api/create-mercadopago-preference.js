@@ -29,9 +29,20 @@ export default async function handler(req, res) {
   }
   const usuario = userData.user
 
+  const { data: configuracao } = await supabaseAdmin
+    .from('configuracoes_loja')
+    .select('aberta, mensagem_fechado')
+    .eq('id', 1)
+    .maybeSingle()
+
+  if (configuracao && !configuracao.aberta) {
+    res.status(409).json({ error: configuracao.mensagem_fechado })
+    return
+  }
+
   const { data: produto, error: produtoError } = await supabaseAdmin
     .from('products')
-    .select('id, name, price, available')
+    .select('id, name, price, available, delivery_type')
     .eq('id', productId)
     .single()
 
@@ -40,14 +51,23 @@ export default async function handler(req, res) {
     return
   }
 
-  const { data: estoqueRow } = await supabaseAdmin
-    .from('estoque_disponivel')
-    .select('disponivel')
-    .eq('product_id', productId)
-    .maybeSingle()
+  // Entrega manual não depende do estoque de codigos_produto -- a chave é enviada por um
+  // humano depois via Telegram, então não há "estoque" pra checar aqui.
+  if (produto.delivery_type !== 'manual') {
+    const { data: estoqueRow } = await supabaseAdmin
+      .from('estoque_disponivel')
+      .select('disponivel')
+      .eq('product_id', productId)
+      .maybeSingle()
 
-  const disponivel = estoqueRow?.disponivel || 0
-  if (!produto.available || disponivel <= 0) {
+    const disponivel = estoqueRow?.disponivel || 0
+    if (disponivel <= 0) {
+      res.status(409).json({ error: 'Este produto está esgotado no momento.' })
+      return
+    }
+  }
+
+  if (!produto.available) {
     res.status(409).json({ error: 'Este produto está esgotado no momento.' })
     return
   }

@@ -69,7 +69,13 @@ function MyOrdersModal({ onFechar }) {
                 </div>
                 <div className="pedido-item-detalhe">
                   <span>{new Date(pedido.created_at).toLocaleString('pt-BR')}</span>
-                  {codigo && <code>{codigo}</code>}
+                  {codigo ? (
+                    <code>{codigo}</code>
+                  ) : (
+                    pedido.status === 'preparando_entrega' && (
+                      <span className="status-badge status-badge-pendente">Preparando entrega</span>
+                    )
+                  )}
                 </div>
               </div>
             )

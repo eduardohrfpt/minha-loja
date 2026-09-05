@@ -18,13 +18,17 @@ import './App.css'
 
 // Depois que o Mercado Pago aprova um pagamento, o webhook (server-side) demora um pouco pra
 // processar e liberar o código. Em vez de mandar o cliente procurar manualmente em "Minhas
-// compras", ficamos checando aqui até o pedido aparecer.
+// compras", ficamos checando aqui até o pedido aparecer. O teto cobre tanto a confirmação do
+// Pix quanto os 10 minutos prometidos pra entrega manual via Telegram.
 const INTERVALO_POLLING_MS = 3000
-const TENTATIVAS_MAX_POLLING = 100 // ~5 minutos, tempo suficiente pra a maioria dos Pix compensar
+const TENTATIVAS_MAX_POLLING = 260 // ~13 minutos
+const PRAZO_ENTREGA_MANUAL_MS = 10 * 60 * 1000
 
 function App() {
   const [produtos, setProdutos] = useState([])
   const [estoque, setEstoque] = useState({})
+  const [lojaAberta, setLojaAberta] = useState(true)
+  const [mensagemLojaFechada, setMensagemLojaFechada] = useState('')
   const [modoAdminAtivo, setModoAdminAtivo] = useState(false)
   const [statusPagamento, setStatusPagamento] = useState(null)
   const cancelarPollingRef = useRef(false)
@@ -52,8 +56,22 @@ function App() {
     setEstoque(mapa)
   }
 
+  async function carregarConfiguracaoLoja() {
+    const { data, error } = await supabase.from('configuracoes_loja').select('aberta, mensagem_fechado').eq('id', 1).maybeSingle()
+
+    if (error) {
+      console.error(error)
+      return
+    }
+    if (data) {
+      setLojaAberta(data.aberta)
+      setMensagemLojaFechada(data.mensagem_fechado)
+    }
+  }
+
   useEffect(() => {
     carregarProdutos()
+    carregarConfiguracaoLoja()
   }, [])
 
   useEffect(() => {
@@ -82,7 +100,7 @@ function App() {
 
         const { data } = await supabase
           .from('orders')
-          .select('products(name, guia_uso_codigo), codigos_produto(codigo)')
+          .select('status, created_at, products(name, guia_uso_codigo), codigos_produto(codigo)')
           .eq('payment_id', paymentId)
           .maybeSingle()
 
@@ -98,11 +116,22 @@ function App() {
           return
         }
 
+        // Entrega manual (via Telegram): o pedido já existe, mas ainda sem código -- mostra o
+        // aviso com o cronômetro de 10 minutos e continua checando em segundo plano.
+        if (data?.status === 'preparando_entrega') {
+          const prazoLimite = new Date(data.created_at).getTime() + PRAZO_ENTREGA_MANUAL_MS
+          setStatusPagamento((atual) =>
+            atual?.estado === 'preparando' ? atual : { estado: 'preparando', produtoNome: data.products?.name, prazoLimite },
+          )
+        }
+
         await new Promise((resolve) => setTimeout(resolve, INTERVALO_POLLING_MS))
       }
 
       if (!cancelarPollingRef.current) {
-        setStatusPagamento((atual) => (atual?.estado === 'confirmando' ? { estado: 'expirado' } : atual))
+        setStatusPagamento((atual) =>
+          atual?.estado === 'confirmando' || atual?.estado === 'preparando' ? { estado: 'expirado' } : atual,
+        )
       }
     }
 
@@ -135,6 +164,9 @@ function App() {
                   estoque={estoque}
                   recarregarProdutos={carregarProdutos}
                   modoAdmin={modoAdminAtivo}
+                  lojaAberta={lojaAberta}
+                  mensagemLojaFechada={mensagemLojaFechada}
+                  recarregarConfiguracaoLoja={carregarConfiguracaoLoja}
                 />
                 <WhyBuy />
                 <Faq />
@@ -152,6 +184,7 @@ function App() {
             produtoNome={statusPagamento.produtoNome}
             codigo={statusPagamento.codigo}
             guiaUso={statusPagamento.guiaUso}
+            prazoLimite={statusPagamento.prazoLimite}
             onFechar={fecharStatusPagamento}
           />
         )}

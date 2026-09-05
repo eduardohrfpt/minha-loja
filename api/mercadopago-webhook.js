@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import { mercadoPagoFetch } from './_lib/mercadopago.js'
 import { criarSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { atualizarHistoricoPedido } from './_lib/historicoPedidos.js'
+import { enviarNotificacaoPedido } from './_lib/telegram.js'
 
 // Camada extra opcional: se MERCADOPAGO_WEBHOOK_SECRET estiver configurado (Painel do Mercado
 // Pago > Sua aplicação > Webhooks > Chave secreta), valida a assinatura do header x-signature.
@@ -78,6 +79,26 @@ export default async function handler(req, res) {
     return
   }
 
+  const { data: produtoInfo } = await supabaseAdmin
+    .from('products')
+    .select('name, delivery_type')
+    .eq('id', productId)
+    .single()
+
+  if (produtoInfo?.delivery_type === 'manual') {
+    await processarEntregaManual({
+      supabaseAdmin,
+      productId,
+      userId,
+      paymentId: String(paymentId),
+      correlacao,
+      produtoNome: produtoInfo.name,
+      valor: pagamento.transaction_amount,
+    })
+    res.status(200).json({ recebido: true })
+    return
+  }
+
   const { data, error } = await supabaseAdmin.rpc('resgatar_codigo_servidor', {
     p_product_id: productId,
     p_user_id: userId,
@@ -106,10 +127,7 @@ export default async function handler(req, res) {
     codigo,
   })
 
-  const [{ data: userData }, { data: produto }] = await Promise.all([
-    supabaseAdmin.auth.admin.getUserById(userId),
-    supabaseAdmin.from('products').select('name').eq('id', productId).single(),
-  ])
+  const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId)
 
   if (userData?.user?.email) {
     const origem = `https://${req.headers.host}`
@@ -120,7 +138,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           email: userData.user.email,
           nome: userData.user.user_metadata?.nome,
-          produtoNome: produto?.name,
+          produtoNome: produtoInfo?.name,
           codigo,
         }),
       })
@@ -136,4 +154,50 @@ export default async function handler(req, res) {
   }
 
   res.status(200).json({ recebido: true })
+}
+
+// Produtos com delivery_type = 'manual' não têm estoque de codigos_produto: em vez de resgatar
+// um código pronto, cria o pedido como "preparando_entrega" e avisa o admin pelo Telegram, que
+// responde (reply) com a chave -- ver api/telegram-webhook.js.
+async function processarEntregaManual({ supabaseAdmin, productId, userId, paymentId, correlacao, produtoNome, valor }) {
+  const { data: pedidoExistente } = await supabaseAdmin
+    .from('orders')
+    .select('id')
+    .eq('payment_id', paymentId)
+    .maybeSingle()
+
+  // Reenvio do webhook pra um pedido que já foi criado -- não notifica de novo.
+  if (pedidoExistente) {
+    await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'aprovado', payment_id: paymentId })
+    return
+  }
+
+  const { data: novoPedido, error: erroPedido } = await supabaseAdmin
+    .from('orders')
+    .insert({
+      user_id: userId,
+      product_id: productId,
+      status: 'preparando_entrega',
+      payment_id: paymentId,
+      payment_gateway: 'mercadopago',
+    })
+    .select('id')
+    .single()
+
+  if (erroPedido) {
+    console.error(`Falha ao criar pedido manual do pagamento ${paymentId}:`, erroPedido.message)
+    return
+  }
+
+  await atualizarHistoricoPedido(supabaseAdmin, correlacao, { status: 'aprovado', payment_id: paymentId })
+
+  const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId)
+  const email = userData?.user?.email || 'e-mail não informado'
+
+  try {
+    const messageId = await enviarNotificacaoPedido({ orderId: novoPedido.id, produtoNome, email, valor })
+    await supabaseAdmin.from('orders').update({ telegram_message_id: messageId }).eq('id', novoPedido.id)
+  } catch (err) {
+    console.error(`Falha ao notificar Telegram do pedido ${novoPedido.id}:`, err.message)
+  }
 }
