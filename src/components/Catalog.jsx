@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
@@ -6,6 +6,7 @@ import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
+import { IconSearch } from './icons'
 
 const formVazio = {
   name: '',
@@ -62,6 +63,13 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
   const [comprando, setComprando] = useState(null)
   const [produtoConfirmando, setProdutoConfirmando] = useState(null)
   const [pedidosAbertos, setPedidosAbertos] = useState(false)
+  const [busca, setBusca] = useState('')
+
+  const produtosFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase()
+    if (!termo) return produtos
+    return produtos.filter((produto) => produto.name.toLowerCase().includes(termo))
+  }, [produtos, busca])
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -221,6 +229,16 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
         <p>Todas as assinaturas disponíveis, com desconto já aplicado.</p>
       </div>
 
+      <div className="busca-catalogo">
+        <IconSearch className="busca-catalogo-icone" />
+        <input
+          type="search"
+          placeholder="Buscar produto por nome..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+      </div>
+
       {adminAtivo && (
         <div className="painel-admin">
           <button className="botao-secundario" onClick={() => setPedidosAbertos(true)}>
@@ -237,7 +255,7 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
       )}
 
       <div className="grade">
-        {produtos.map((produto) => {
+        {produtosFiltrados.map((produto) => {
           const qtdEstoque = estoque[produto.id] || 0
           const semEstoque = qtdEstoque === 0
           const disponivelReal = produto.available && !semEstoque
@@ -309,6 +327,9 @@ function Catalog({ produtos, estoque, recarregarProdutos, modoAdmin }) {
         })}
 
         {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
+        {produtos.length > 0 && produtosFiltrados.length === 0 && (
+          <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
+        )}
       </div>
 
       <ProductDetailsModal

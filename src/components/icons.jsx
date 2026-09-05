@@ -118,6 +118,15 @@ export function IconPhone(props) {
   )
 }
 
+export function IconSearch(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4.3-4.3" />
+    </svg>
+  )
+}
+
 export function IconCard(props) {
   return (
     <svg {...base} {...props}>

@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { IconEye, IconEyeOff } from './icons'
-import { rolarPara } from '../utils'
+import { irParaSecao } from '../utils'
 
 function AuthModal({ modoInicial, onFechar }) {
   const { entrar, cadastrar } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [modo, setModo] = useState(modoInicial)
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
@@ -32,7 +35,7 @@ function AuthModal({ modoInicial, onFechar }) {
       alert('Conta criada! Se for solicitada confirmação por e-mail, verifique sua caixa de entrada antes de entrar.')
     }
     onFechar()
-    rolarPara('produtos')
+    irParaSecao(location, navigate, 'produtos')
   }
 
   return createPortal(
