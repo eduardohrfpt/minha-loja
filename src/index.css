@@ -1,8 +1,10 @@
 :root {
   --azul: #0f2b46;
   --azul-claro: #1c3f60;
+  --azul-tint: #e8eef6;
   --verde: #10b981;
   --verde-escuro: #0a9c6f;
+  --verde-tint: #e0f8ee;
   --bg: #ffffff;
   --bg-alt: #f6f8f9;
   --texto: #33475b;
@@ -10,13 +12,16 @@
   --titulo: #0f2b46;
   --borda: #e4e9ed;
   --sombra: 0 20px 40px -20px rgba(15, 43, 70, 0.25);
-  --raio: 16px;
-  --raio-sm: 10px;
+  --sombra-suave: 0 10px 28px -16px rgba(15, 43, 70, 0.18);
+  --sombra-media: 0 18px 36px -14px rgba(15, 43, 70, 0.24);
+  --raio: 20px;
+  --raio-sm: 12px;
+  --raio-lg: 28px;
 
   font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--texto);
   background: var(--bg);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -32,6 +37,7 @@ body {
 h1, h2, h3, h4 {
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--titulo);
+  font-weight: 700;
   margin: 0;
 }
 

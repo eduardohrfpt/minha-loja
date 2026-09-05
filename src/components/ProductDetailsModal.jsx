@@ -31,7 +31,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
   const descricaoCurta = produto.description || produto.resumo_final || produto.tagline
   const passosAtivacao = produto.instrucoes_ativacao
     ?.split('\n')
-    .map((passo) => passo.trim())
+    .map((passo) => passo.trim().replace(/^\d+\s*[-.).]\s*/, ''))
     .filter(Boolean)
 
   return createPortal(
