@@ -1505,6 +1505,24 @@
   background: #dc2626;
 }
 
+.status-icone-animada {
+  animation: pop-status-sucesso 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-status-sucesso {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .status-codigo {
   width: 100%;
   display: flex;

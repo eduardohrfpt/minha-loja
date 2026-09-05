@@ -21,8 +21,46 @@ function Cronometro({ prazoLimite }) {
   return <div className="cronometro-entrega">{formatarTempo(restante)}</div>
 }
 
+// Sintetizado via Web Audio API (sem precisar de um arquivo de áudio). Silencioso se o
+// navegador bloquear autoplay de som sem interação recente do usuário -- não é crítico.
+function tocarSomSucesso() {
+  try {
+    const AudioContextClasse = window.AudioContext || window.webkitAudioContext
+    if (!AudioContextClasse) return
+    const contexto = new AudioContextClasse()
+    const agora = contexto.currentTime
+
+    const tocarNota = (frequencia, inicio, duracao) => {
+      const oscilador = contexto.createOscillator()
+      const ganho = contexto.createGain()
+      oscilador.type = 'sine'
+      oscilador.frequency.value = frequencia
+      ganho.gain.setValueAtTime(0, agora + inicio)
+      ganho.gain.linearRampToValueAtTime(0.2, agora + inicio + 0.02)
+      ganho.gain.exponentialRampToValueAtTime(0.001, agora + inicio + duracao)
+      oscilador.connect(ganho)
+      ganho.connect(contexto.destination)
+      oscilador.start(agora + inicio)
+      oscilador.stop(agora + inicio + duracao)
+    }
+
+    tocarNota(880, 0, 0.15)
+    tocarNota(1318.5, 0.12, 0.25)
+  } catch {
+    // API indisponível ou bloqueada -- segue sem som.
+  }
+}
+
 function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimite, onFechar }) {
   const podeFechar = estado !== 'confirmando'
+
+  // Toca o som só no momento em que a tela vira "sucesso" (inclusive na transição automática
+  // vindo de "preparando"), não em toda renderização.
+  useEffect(() => {
+    if (estado === 'sucesso') {
+      tocarSomSucesso()
+    }
+  }, [estado])
 
   return createPortal(
     <div className="overlay" onClick={podeFechar ? onFechar : undefined}>
@@ -48,8 +86,8 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimit
             <p className="detalhe-texto-livre">Sua entrega será feita em até 10 minutos.</p>
             {prazoLimite && <Cronometro prazoLimite={prazoLimite} />}
             <p className="detalhe-texto-livre detalhe-texto-pequeno">
-              Você pode fechar esta tela: assim que a chave estiver pronta, enviamos por e-mail e ela também aparece
-              em "Minhas compras".
+              Fique nesta tela — assim que sua chave estiver pronta, ela aparece aqui automaticamente. Você também
+              pode conferir depois em "Minhas compras" ou no seu e-mail.
             </p>
             <div className="acoes-formulario">
               <button className="botao-primario" onClick={onFechar}>
@@ -61,7 +99,7 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimit
 
         {estado === 'sucesso' && (
           <>
-            <span className="status-icone status-icone-ok" aria-hidden="true">
+            <span className="status-icone status-icone-ok status-icone-animada" aria-hidden="true">
               ✓
             </span>
             <h2>Pagamento aprovado!</h2>
