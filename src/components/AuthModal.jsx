@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { IconEye, IconEyeOff } from './icons'
+import { IconEye, IconEyeOff, IconLock } from './icons'
 
 function AuthModal({ modoInicial, onFechar }) {
   const { entrar, cadastrar } = useAuth()
@@ -39,7 +39,12 @@ function AuthModal({ modoInicial, onFechar }) {
   return createPortal(
     <div className="overlay" onClick={onFechar}>
       <form className="formulario" onClick={(e) => e.stopPropagation()} onSubmit={enviar}>
-        <h2>{modo === 'login' ? 'Entrar' : 'Criar conta'}</h2>
+        <div className="formulario-titulo">
+          <span className="formulario-icone">
+            <IconLock />
+          </span>
+          <h2>{modo === 'login' ? 'Entrar' : 'Criar conta'}</h2>
+        </div>
 
         {modo === 'cadastro' && (
           <label>

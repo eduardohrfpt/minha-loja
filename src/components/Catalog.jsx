@@ -6,7 +6,7 @@ import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
-import { IconSearch } from './icons'
+import { IconSearch, IconShield } from './icons'
 
 const formVazio = {
   name: '',
@@ -382,6 +382,9 @@ function Catalog({
       {produtoConfirmando && (
         <div className="overlay" onClick={() => setProdutoConfirmando(null)}>
           <div className="modal-status-pagamento" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icone-topo">
+              <IconShield />
+            </div>
             <h2>Aviso importante</h2>
             <p className="detalhe-texto-livre">
               Após o pagamento, clique em <strong>"Voltar"</strong> na parte de baixo da tela para ver o código da

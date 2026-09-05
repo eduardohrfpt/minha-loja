@@ -114,16 +114,35 @@
 
 .nav-desktop button,
 .nav-desktop a {
+  position: relative;
   background: none;
   border: none;
   font-size: 14px;
   font-weight: 500;
   color: var(--texto);
   text-decoration: none;
+  padding-bottom: 3px;
+  transition: color 0.15s ease;
+}
+.nav-desktop button::after,
+.nav-desktop a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--verde);
+  transition: right 0.2s ease;
 }
 .nav-desktop button:hover,
 .nav-desktop a:hover {
   color: var(--azul);
+}
+.nav-desktop button:hover::after,
+.nav-desktop a:hover::after {
+  right: 0;
 }
 
 .cabecalho-acoes {
@@ -143,7 +162,22 @@
 /* Só reserva o espaço pra não ficar embaixo do cabeçalho fixo e separar da próxima seção --
    sem fundo, pra não virar uma faixa cinza maior que o conteúdo da .hero em si. */
 .hero-secao {
+  position: relative;
+  isolation: isolate;
   padding: 96px 24px 56px;
+}
+
+/* Glow radial suave nos cantos, atrás de toda a seção (não do texto) -- profundidade sem
+   poluir. z-index negativo + isolation no pai garante que fique atrás do conteúdo. */
+.hero-secao::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(640px circle at 10% 15%, rgba(16, 185, 129, 0.12), transparent 60%),
+    radial-gradient(640px circle at 90% 85%, rgba(15, 43, 70, 0.1), transparent 60%);
+  pointer-events: none;
 }
 
 .hero {
@@ -593,6 +627,10 @@
   border: 1px solid var(--borda);
   border-radius: var(--raio-sm);
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.card:hover .icone-marca {
+  transform: scale(1.05);
 }
 
 .icone-marca-imagem {
@@ -625,6 +663,17 @@
 }
 .disponibilidade.ok {
   color: var(--verde-escuro);
+}
+.disponibilidade.ok i {
+  animation: pulso-disponivel 2s ease-in-out infinite;
+}
+@keyframes pulso-disponivel {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+  }
 }
 .disponibilidade.indisponivel {
   color: #94a3b8;
@@ -703,12 +752,63 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 43, 70, 0.5);
+  background: rgba(15, 43, 70, 0.55);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   z-index: 100;
+  animation: overlay-fade-in 0.2s ease;
+}
+
+/* Entrada suave de qualquer modal/formulário aberto dentro do overlay -- cobre todos de uma
+   vez, sem precisar de uma animação dedicada por componente. */
+.overlay > * {
+  animation: modal-pop-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Scrollbar discreta nas áreas roláveis de modais -- Firefox e Chromium. */
+.detalhe-scroll,
+.modal-estoque,
+.modal-pedidos,
+.formulario,
+.pagina-politicas {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borda) transparent;
+}
+.detalhe-scroll::-webkit-scrollbar,
+.modal-estoque::-webkit-scrollbar,
+.modal-pedidos::-webkit-scrollbar,
+.formulario::-webkit-scrollbar {
+  width: 8px;
+}
+.detalhe-scroll::-webkit-scrollbar-thumb,
+.modal-estoque::-webkit-scrollbar-thumb,
+.modal-pedidos::-webkit-scrollbar-thumb,
+.formulario::-webkit-scrollbar-thumb {
+  background: var(--borda);
+  border-radius: 999px;
 }
 
 .modal-detalhes-completo {
@@ -1016,6 +1116,43 @@
   margin-bottom: 4px;
 }
 
+.formulario-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+.formulario-titulo h2 {
+  margin-bottom: 0;
+}
+
+.formulario-icone,
+.modal-icone-topo {
+  display: grid;
+  place-items: center;
+  border-radius: var(--raio-sm);
+  background: var(--azul-tint);
+  color: var(--azul);
+  flex-shrink: 0;
+}
+.formulario-icone {
+  width: 40px;
+  height: 40px;
+}
+.formulario-icone svg {
+  width: 20px;
+  height: 20px;
+}
+.modal-icone-topo {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+}
+.modal-icone-topo svg {
+  width: 24px;
+  height: 24px;
+}
+
 .formulario label {
   display: flex;
   flex-direction: column;
@@ -1043,6 +1180,19 @@
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.formulario input[type='text']:focus,
+.formulario input[type='number']:focus,
+.formulario input[type='email']:focus,
+.formulario input[type='password']:focus,
+.formulario input:not([type]):focus,
+.formulario select:focus,
+.formulario textarea:focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .lista-itens {
@@ -1118,8 +1268,13 @@
 }
 
 .erro-form {
-  color: #dc2626;
+  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--raio-sm);
+  padding: 10px 12px;
   font-size: 13px;
+  font-weight: 500;
   margin: 0;
 }
 
@@ -1152,6 +1307,11 @@
   border: 1px solid var(--borda);
   background: #fff;
   color: var(--texto);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.acoes-formulario button:not(.botao-primario):hover {
+  background: var(--bg-alt);
+  border-color: var(--azul);
 }
 
 /* .acoes-formulario button (classe + elemento) é mais específico que .botao-primario
@@ -1262,13 +1422,34 @@
 /* CTA final */
 
 .cta-final {
-  margin: 0 24px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  max-width: 1180px;
+  margin: 96px auto;
   border-radius: var(--raio-lg);
   padding: 72px 32px;
   text-align: center;
   background: linear-gradient(135deg, var(--azul), var(--verde-escuro));
   color: #fff;
   box-shadow: var(--sombra-media);
+}
+
+/* Realce sutil de luz no card escuro, mesma ideia do glow do hero mas em tom claro por cima
+   do gradiente (em vez das cores da marca dessaturadas, que não apareceriam aqui). */
+.cta-final::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(560px circle at 82% -10%, rgba(255, 255, 255, 0.16), transparent 60%);
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .cta-final {
+    margin: 72px 24px;
+  }
 }
 
 .cta-final h2 {
@@ -1755,6 +1936,7 @@
   margin-bottom: -1px;
   text-decoration: none;
   display: inline-block;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .aba-botao:hover {
@@ -1887,6 +2069,9 @@
   white-space: nowrap;
 }
 
+.tabela-pedidos tbody tr {
+  transition: background 0.15s ease;
+}
 .tabela-pedidos tbody tr:hover {
   background: var(--bg-alt);
 }
@@ -1990,6 +2175,8 @@
 
 .politicas-secao {
   margin-bottom: 28px;
+  padding-left: 16px;
+  border-left: 3px solid var(--borda);
 }
 
 .politicas-secao h3 {

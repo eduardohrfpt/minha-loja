@@ -54,6 +54,28 @@ a {
   color: inherit;
 }
 
+/* Anel de foco consistente e da marca em qualquer elemento interativo, no lugar do outline
+   padrão do navegador -- acessível e mais elegante. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
 #root {
   min-height: 100svh;
+  animation: entrada-app 0.35s ease;
+}
+
+@keyframes entrada-app {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

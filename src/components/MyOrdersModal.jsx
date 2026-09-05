@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { formatarPreco } from '../utils'
 import CodigoDetalheModal from './CodigoDetalheModal'
 import IconeProduto from './IconeProduto'
+import { IconPackage } from './icons'
 
 function MyOrdersModal({ onFechar }) {
   const { usuario } = useAuth()
@@ -35,7 +36,12 @@ function MyOrdersModal({ onFechar }) {
   return createPortal(
     <div className="overlay" onClick={onFechar}>
       <div className="modal-estoque" onClick={(e) => e.stopPropagation()}>
-        <h2>Minhas compras</h2>
+        <div className="formulario-titulo">
+          <span className="formulario-icone">
+            <IconPackage />
+          </span>
+          <h2>Minhas compras</h2>
+        </div>
 
         {carregando && <p className="vazio">Carregando...</p>}
         {!carregando && pedidos.length === 0 && <p className="vazio">Você ainda não fez nenhuma compra.</p>}
