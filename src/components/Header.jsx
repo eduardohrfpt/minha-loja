@@ -54,7 +54,7 @@ function Header() {
               <button className="botao-fantasma" onClick={() => setMinhasComprasAberto(true)}>
                 Minhas compras
               </button>
-              <button className="botao-fantasma" onClick={() => { sair(); navigate('/') }}>
+              <button className="botao-fantasma" onClick={async () => { await sair(); window.location.href = '/' }}>
                 Sair
               </button>
             </>
