@@ -52,7 +52,7 @@ function tocarSomSucesso() {
 }
 
 function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimite, onFechar }) {
-  const podeFechar = estado !== 'confirmando'
+  const podeFechar = estado !== 'confirmando' && estado !== 'preparando'
 
   // Toca o som só no momento em que a tela vira "sucesso" (inclusive na transição automática
   // vindo de "preparando"), não em toda renderização.
@@ -89,11 +89,6 @@ function PagamentoStatusModal({ estado, produtoNome, codigo, guiaUso, prazoLimit
               Fique nesta tela — assim que sua chave estiver pronta, ela aparece aqui automaticamente. Você também
               pode conferir depois em "Minhas compras" ou no seu e-mail.
             </p>
-            <div className="acoes-formulario">
-              <button className="botao-primario" onClick={onFechar}>
-                Fechar
-              </button>
-            </div>
           </>
         )}
 
