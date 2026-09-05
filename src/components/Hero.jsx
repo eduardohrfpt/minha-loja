@@ -14,9 +14,9 @@ function Hero({ produtosDestaque }) {
           <h1>Assinaturas premium por um preço muito mais baixo.</h1>
           <p className="hero-destaque">Acesso legítimo às plataformas originais, com desconto de até 90%.</p>
           <p className="hero-subtitulo">
-            Compramos as licenças direto na fonte e repassamos a diferença pra você. O produto é
-            100% original — a única diferença é o preço. Entrega rápida após a confirmação do
-            pagamento.
+            Compramos em maior escala para conseguir os melhores preços — e repassamos essa
+            vantagem a você. O produto é 100% original — a única diferença é o preço. Entrega
+            rápida após a confirmação do pagamento.
           </p>
           <div className="hero-acoes">
             <button className="botao-primario botao-grande" onClick={() => rolarPara('produtos')}>
