@@ -105,14 +105,17 @@
   gap: 28px;
 }
 
-.nav-desktop button {
+.nav-desktop button,
+.nav-desktop a {
   background: none;
   border: none;
   font-size: 14px;
   font-weight: 500;
   color: var(--texto);
+  text-decoration: none;
 }
-.nav-desktop button:hover {
+.nav-desktop button:hover,
+.nav-desktop a:hover {
   color: var(--azul);
 }
 
@@ -1882,6 +1885,13 @@
 }
 .politicas-secao p:last-child {
   margin-bottom: 0;
+}
+
+.suporte-icone-inline {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  color: var(--verde-escuro);
 }
 
 @media (max-width: 640px) {

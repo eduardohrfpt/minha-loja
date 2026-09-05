@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { supabase } from './lib/supabaseClient'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -14,7 +14,30 @@ import Footer from './components/Footer'
 import AdminToggle from './components/AdminToggle'
 import PagamentoStatusModal from './components/PagamentoStatusModal'
 import PoliticasPage from './components/PoliticasPage'
+import SuportePage from './components/SuportePage'
 import './App.css'
+
+// Landing (marketing) só aparece pra quem ainda não tem conta. Quem já está logado cai direto
+// no catálogo ao acessar "/" -- não faz sentido mostrar hero/vantagens/FAQ pra quem já é cliente.
+function PaginaInicial(propsCatalogo) {
+  const { usuario } = useAuth()
+
+  if (usuario) {
+    return <Navigate to="/catalogo" replace />
+  }
+
+  return (
+    <>
+      <Hero produtosDestaque={propsCatalogo.produtos.slice(0, 4)} />
+      <TrustBar />
+      <HowItWorks />
+      <Catalog {...propsCatalogo} />
+      <WhyBuy />
+      <Faq />
+      <CtaFinal />
+    </>
+  )
+}
 
 // Depois que o Mercado Pago aprova um pagamento, o webhook (server-side) demora um pouco pra
 // processar e liberar o código. Em vez de mandar o cliente procurar manualmente em "Minhas
@@ -155,25 +178,32 @@ function App() {
           <Route
             path="/"
             element={
-              <>
-                <Hero produtosDestaque={produtos.slice(0, 4)} />
-                <TrustBar />
-                <HowItWorks />
-                <Catalog
-                  produtos={produtos}
-                  estoque={estoque}
-                  recarregarProdutos={carregarProdutos}
-                  modoAdmin={modoAdminAtivo}
-                  lojaAberta={lojaAberta}
-                  mensagemLojaFechada={mensagemLojaFechada}
-                  recarregarConfiguracaoLoja={carregarConfiguracaoLoja}
-                />
-                <WhyBuy />
-                <Faq />
-                <CtaFinal />
-              </>
+              <PaginaInicial
+                produtos={produtos}
+                estoque={estoque}
+                recarregarProdutos={carregarProdutos}
+                modoAdmin={modoAdminAtivo}
+                lojaAberta={lojaAberta}
+                mensagemLojaFechada={mensagemLojaFechada}
+                recarregarConfiguracaoLoja={carregarConfiguracaoLoja}
+              />
             }
           />
+          <Route
+            path="/catalogo"
+            element={
+              <Catalog
+                produtos={produtos}
+                estoque={estoque}
+                recarregarProdutos={carregarProdutos}
+                modoAdmin={modoAdminAtivo}
+                lojaAberta={lojaAberta}
+                mensagemLojaFechada={mensagemLojaFechada}
+                recarregarConfiguracaoLoja={carregarConfiguracaoLoja}
+              />
+            }
+          />
+          <Route path="/suporte" element={<SuportePage />} />
           <Route path="/politicas/:aba" element={<PoliticasPage />} />
         </Routes>
         <Footer />

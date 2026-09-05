@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { irParaSecao } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import AuthModal from './AuthModal'
 import MyOrdersModal from './MyOrdersModal'
 
-const linksNav = [
+const linksNavVisitante = [
   { id: 'produtos', label: 'Produtos' },
   { id: 'como-funciona', label: 'Como funciona' },
   { id: 'vantagens', label: 'Vantagens' },
@@ -21,18 +21,30 @@ function Header() {
   return (
     <header className="cabecalho">
       <div className="cabecalho-conteudo">
-        <button className="marca" onClick={() => irParaSecao(location, navigate, 'topo')}>
+        <button
+          className="marca"
+          onClick={() => (usuario ? navigate('/catalogo') : irParaSecao(location, navigate, 'topo'))}
+        >
           <span className="marca-icone">HR</span>
           <span className="marca-texto">HRKeys</span>
         </button>
 
         <nav className="nav-desktop">
-          {linksNav.map((link) => (
-            <button key={link.id} onClick={() => irParaSecao(location, navigate, link.id)}>
-              {link.label}
-            </button>
-          ))}
-          {!usuario && <button onClick={() => setModalAberto('cadastro')}>Criar conta</button>}
+          {usuario ? (
+            <>
+              <Link to="/catalogo">Catálogo</Link>
+              <Link to="/suporte">Suporte/Ajuda</Link>
+            </>
+          ) : (
+            <>
+              {linksNavVisitante.map((link) => (
+                <button key={link.id} onClick={() => irParaSecao(location, navigate, link.id)}>
+                  {link.label}
+                </button>
+              ))}
+              <button onClick={() => setModalAberto('cadastro')}>Criar conta</button>
+            </>
+          )}
         </nav>
 
         <div className="cabecalho-acoes">
