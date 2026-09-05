@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { formatarPreco, rolarPara } from '../utils'
 import IconeProduto from './IconeProduto'
+import AuthModal from './AuthModal'
 
 function Hero({ produtosDestaque }) {
+  const [modalAberto, setModalAberto] = useState(false)
+
   return (
     <section id="topo" className="hero-secao">
       <div className="hero">
@@ -17,11 +21,18 @@ function Hero({ produtosDestaque }) {
             <button className="botao-primario botao-grande" onClick={() => rolarPara('produtos')}>
               Ver produtos
             </button>
+            <button className="botao-secundario botao-grande" onClick={() => setModalAberto(true)}>
+              Criar conta grátis
+            </button>
           </div>
         </div>
 
         <div className="hero-card">
           <span className="hero-card-selo">Economize até 90%</span>
+          <div className="hero-card-cabecalho">
+            <strong>Seus produtos</strong>
+            <span>Entrega em até 10 minutos</span>
+          </div>
           {produtosDestaque.map((produto) => (
             <div className="hero-card-item" key={produto.id}>
               <IconeProduto produto={produto} className="hero-card-icone" />
@@ -31,7 +42,10 @@ function Hero({ produtosDestaque }) {
               </div>
               <div className="hero-card-preco">
                 {produto.discount > 0 && (
-                  <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                  <div className="precos-linha">
+                    <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                    <span className="etiqueta-desconto">-{produto.discount}%</span>
+                  </div>
                 )}
                 <span className="preco-final-pequeno">{formatarPreco(produto.price)}</span>
               </div>
@@ -39,6 +53,8 @@ function Hero({ produtosDestaque }) {
           ))}
         </div>
       </div>
+
+      {modalAberto && <AuthModal modoInicial="cadastro" onFechar={() => setModalAberto(false)} />}
     </section>
   )
 }
