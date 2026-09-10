@@ -9,22 +9,38 @@ const GARANTIA_FICHA = 'Reembolso integral se a entrega falhar'
 
 const SELOS_CONFIANCA = [
   { Icone: IconShield, texto: 'Não recebeu? Devolvemos 100%' },
-  { Icone: IconLock, texto: 'Pagamento pelo Mercado Pago' },
+  {
+    Icone: IconLock,
+    texto: 'Pagamento pelo Mercado Pago — os dados do seu cartão não passam pela nossa loja em nenhum momento',
+  },
   { Icone: IconHeadset, texto: 'Suporte humano' },
 ]
 
 const AVISO_CURTO =
   'Ao ativar o código, você aceita os termos da plataforma original; a compra não pode ser trocada ou estornada após a ativação.'
 
-const ENTREGA_RESUMO = 'Até 10 min'
-const EXPLICACAO_ENTREGA =
+// Produtos de entrega manual (delivery_type = "manual") não saem na hora -- alguém da equipe
+// prepara e envia depois (ver api/mercadopago-webhook.js), então a promessa de "até 10 min" só
+// vale pra entrega automática (imediata); pra manual usamos um prazo mais realista.
+const ENTREGA_RESUMO_IMEDIATA = 'Até 10 min'
+const ENTREGA_RESUMO_MANUAL = 'Até 24h'
+const EXPLICACAO_ENTREGA_IMEDIATA =
   'Nosso sistema realiza a entrega automaticamente. O prazo típico é de até 10 minutos após a confirmação do pagamento.'
-const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
+const EXPLICACAO_ENTREGA_MANUAL =
+  'Nossa equipe prepara e envia a entrega manualmente. Normalmente em até 10 minutos, podendo levar até 24h em dias de alta demanda.'
+const PRAZO_ENTREGA_FICHA_IMEDIATA = 'Até 10 minutos após a confirmação do pagamento'
+const PRAZO_ENTREGA_FICHA_MANUAL = 'Normalmente até 10 minutos, podendo levar até 24h em dias de alta demanda'
 
 function ProductDetailsModal({ produto, onFechar, onComprar }) {
   if (!produto) return null
 
-  const estoque = produto.estoqueReal ?? produto.estoque
+  // Entrega manual não usa o estoque de codigos_produto (ver Catalog.jsx) -- mostrar a
+  // contagem aqui confundiria o cliente com um número que não representa disponibilidade real.
+  const entregaManual = produto.delivery_type === 'manual'
+  const estoque = entregaManual ? null : produto.estoqueReal ?? produto.estoque
+  const entregaResumo = entregaManual ? ENTREGA_RESUMO_MANUAL : ENTREGA_RESUMO_IMEDIATA
+  const explicacaoEntrega = entregaManual ? EXPLICACAO_ENTREGA_MANUAL : EXPLICACAO_ENTREGA_IMEDIATA
+  const prazoEntregaFicha = entregaManual ? PRAZO_ENTREGA_FICHA_MANUAL : PRAZO_ENTREGA_FICHA_IMEDIATA
   const itensIncluidos = Array.from(
     new Set([...(produto.beneficios || []), ...(produto.features || [])].map((item) => item.trim()).filter(Boolean)),
   )
@@ -62,7 +78,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
               <IconBolt className="icone-rapido-svg" />
               <div>
                 <strong>Entrega</strong>
-                <span>{ENTREGA_RESUMO}</span>
+                <span>{entregaResumo}</span>
               </div>
             </div>
             <div className="icone-rapido">
@@ -99,7 +115,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
 
           <div className="detalhe-bloco">
             <h4>Como funciona a entrega</h4>
-            <p className="detalhe-texto-livre">{EXPLICACAO_ENTREGA}</p>
+            <p className="detalhe-texto-livre">{explicacaoEntrega}</p>
             {produto.aviso_prazo && <p className="aviso-prazo aviso-prazo-inline">{produto.aviso_prazo}</p>}
           </div>
 
@@ -132,7 +148,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
                 </tr>
                 <tr>
                   <th>Prazo de entrega</th>
-                  <td>{PRAZO_ENTREGA_FICHA}</td>
+                  <td>{prazoEntregaFicha}</td>
                 </tr>
                 <tr>
                   <th>Garantia</th>

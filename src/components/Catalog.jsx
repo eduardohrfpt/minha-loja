@@ -289,8 +289,13 @@ function Catalog({
 
       <div className="grade">
         {produtosFiltrados.map((produto) => {
+          // Só produtos de entrega imediata dependem do estoque de codigos_produto -- entrega
+          // manual (ver api/mercadopago-webhook.js) não consome nem checa esse estoque, então
+          // não faz sentido marcar como "Esgotado" um produto assim só por não ter códigos
+          // pré-cadastrados.
+          const usaEstoqueDeCodigos = produto.delivery_type !== 'manual'
           const qtdEstoque = estoque[produto.id] || 0
-          const semEstoque = qtdEstoque === 0
+          const semEstoque = usaEstoqueDeCodigos && qtdEstoque === 0
           const disponivelReal = produto.available && !semEstoque
           const statusTexto = semEstoque ? 'Esgotado' : produto.available ? 'Em estoque' : 'Indisponível'
 
