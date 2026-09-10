@@ -31,6 +31,11 @@
     <script type="text/javascript">
       var Tawk_API = Tawk_API || {},
         Tawk_LoadStart = new Date();
+      // Widget escondido por padrão em todo o site -- só aparece quando o próprio código
+      // da aplicação chama Tawk_API.showWidget() (ex: botão de suporte em "Minhas compras").
+      Tawk_API.onLoad = function () {
+        Tawk_API.hideWidget();
+      };
       (function () {
         var s1 = document.createElement("script"),
           s0 = document.getElementsByTagName("script")[0];

@@ -15,3 +15,26 @@ export function irParaSecao(location, navigate, id) {
 export function formatarPreco(valor) {
   return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
+
+// Abre o chat do Tawk.to (widget fica escondido por padrão -- ver index.html). Se o script
+// ainda não terminou de carregar, agenda a abertura pra rodar assim que ele ficar pronto.
+export function abrirChatSuporte() {
+  const tawk = window.Tawk_API
+  if (!tawk) return
+
+  const abrir = () => {
+    tawk.showWidget?.()
+    tawk.maximize?.()
+  }
+
+  if (typeof tawk.showWidget === 'function') {
+    abrir()
+    return
+  }
+
+  const onLoadAnterior = tawk.onLoad
+  tawk.onLoad = function () {
+    onLoadAnterior?.()
+    abrir()
+  }
+}

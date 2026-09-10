@@ -1760,6 +1760,13 @@
 .modal-status-pagamento .acoes-formulario {
   margin-top: 10px;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botão de suporte fica sozinho na própria linha, acima de Fechar -- evita apertar dois
+   botões lado a lado quando o texto do primeiro é longo. */
+.modal-status-pagamento .botao-suporte {
+  width: 100%;
 }
 
 .modal-status-pagamento .acoes-formulario button:not(.botao-primario) {

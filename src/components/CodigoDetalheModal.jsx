@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom'
+import { abrirChatSuporte } from '../utils'
 
 function CodigoDetalheModal({ produtoNome, codigo, guiaUso, onFechar }) {
   // Este modal pode ser aberto de dentro de outro modal (ex: "Minhas compras"). Mesmo
@@ -28,6 +29,9 @@ function CodigoDetalheModal({ produtoNome, codigo, guiaUso, onFechar }) {
           </div>
         )}
         <div className="acoes-formulario">
+          <button className="botao-secundario botao-suporte" onClick={abrirChatSuporte}>
+            Falar com o suporte sobre esta compra
+          </button>
           <button className="botao-primario" onClick={fechar}>
             Fechar
           </button>
