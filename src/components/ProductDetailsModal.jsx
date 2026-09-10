@@ -60,6 +60,12 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
             <h3>{produto.name}</h3>
             <span className="card-marca">{produto.brand}</span>
             <div className="detalhe-preco-linha">
+              {produto.preco_referencia > 0 && (
+                <div className="preco-referencia-bloco">
+                  <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+                  <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+                </div>
+              )}
               <div className="precos-linha">
                 {produto.discount > 0 && (
                   <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
@@ -67,7 +73,11 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
                 {produto.discount > 0 && <span className="etiqueta-desconto">-{produto.discount}%</span>}
               </div>
               <span className="preco-final">{formatarPreco(produto.price)}</span>
-              {estoque != null && <span className="badge-estoque">{estoque} em estoque</span>}
+              {estoque != null && (
+                <span className="badge-estoque">
+                  {estoque === 0 ? 'Esgotado' : `${estoque} ${estoque === 1 ? 'unidade disponível' : 'unidades disponíveis'}`}
+                </span>
+              )}
             </div>
           </div>
 

@@ -679,6 +679,33 @@
   color: #94a3b8;
 }
 
+/* Preço "oficial" de referência (opcional, campo preco_referencia) -- fica acima de .precos,
+   riscado, pra reforçar que o preço de venda é bem menor que o oficial da plataforma. */
+.preco-referencia-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.preco-referencia-valor {
+  text-decoration: line-through;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.preco-referencia-legenda {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--verde-escuro);
+}
+
+/* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
+.detalhe-preco-linha .preco-referencia-bloco {
+  align-items: center;
+  text-align: center;
+}
+
 .precos {
   display: flex;
   flex-direction: column;

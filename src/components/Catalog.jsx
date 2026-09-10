@@ -19,6 +19,7 @@ const formVazio = {
   duration: '',
   original_price: '',
   discount: '',
+  preco_referencia: '',
   description: '',
   features: [],
   tagline: '',
@@ -99,6 +100,7 @@ function Catalog({
       duration: produto.duration || '',
       original_price: produto.original_price,
       discount: produto.discount,
+      preco_referencia: produto.preco_referencia ?? '',
       description: produto.description || '',
       features: produto.features || [],
       tagline: produto.tagline || '',
@@ -154,6 +156,10 @@ function Catalog({
       original_price: originalPrice,
       price: originalPrice - (originalPrice * discount) / 100,
       discount,
+      // Preço "oficial" da plataforma pra comparação (ex: valor cobrado direto no site da
+      // Disney+) -- opcional e independente do desconto acima, que é o da própria HRKeys. Só
+      // aparece pro cliente se o admin preencher; nunca inventamos um valor aqui.
+      preco_referencia: parseFloat(form.preco_referencia) || null,
       description: form.description,
       features: form.features.map((item) => item.trim()).filter(Boolean),
       tagline: form.tagline,
@@ -297,7 +303,17 @@ function Catalog({
           const qtdEstoque = estoque[produto.id] || 0
           const semEstoque = usaEstoqueDeCodigos && qtdEstoque === 0
           const disponivelReal = produto.available && !semEstoque
-          const statusTexto = semEstoque ? 'Esgotado' : produto.available ? 'Em estoque' : 'Indisponível'
+          // Produto de código fixo (imediata) com estoque real: mostra a contagem, em
+          // linguagem simples ("3 unidades disponíveis"), em vez de um badge genérico -- ajuda
+          // o cliente a decidir na hora. Entrega manual não tem uma contagem real pra mostrar
+          // (ver comentário acima), então continua só "Disponível".
+          const statusTexto = semEstoque
+            ? 'Esgotado'
+            : !produto.available
+              ? 'Indisponível'
+              : usaEstoqueDeCodigos
+                ? `${qtdEstoque} ${qtdEstoque === 1 ? 'unidade disponível' : 'unidades disponíveis'}`
+                : 'Disponível'
 
           return (
             <div className="card" key={produto.id}>
@@ -323,6 +339,12 @@ function Catalog({
                 {statusTexto}
               </span>
 
+              {produto.preco_referencia > 0 && (
+                <div className="preco-referencia-bloco">
+                  <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+                  <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+                </div>
+              )}
               <div className="precos">
                 <div className="precos-linha">
                   {produto.discount > 0 && (
@@ -446,6 +468,16 @@ function Catalog({
             <label>
               Desconto (%)
               <input type="number" step="1" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} />
+            </label>
+            <label>
+              Preço de referência (R$) — opcional
+              <input
+                type="number"
+                step="0.01"
+                value={form.preco_referencia}
+                onChange={(e) => setForm({ ...form, preco_referencia: e.target.value })}
+                placeholder="Ex: preço oficial cobrado direto no site da plataforma"
+              />
             </label>
             <label>
               Duração
