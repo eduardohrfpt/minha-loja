@@ -19,28 +19,26 @@ const SELOS_CONFIANCA = [
 const AVISO_CURTO =
   'Ao ativar o código, você aceita os termos da plataforma original; a compra não pode ser trocada ou estornada após a ativação.'
 
-// Produtos de entrega manual (delivery_type = "manual") não saem na hora -- alguém da equipe
-// prepara e envia depois (ver api/mercadopago-webhook.js), então a promessa de "até 10 min" só
-// vale pra entrega automática (imediata); pra manual usamos um prazo mais realista.
-const ENTREGA_RESUMO_IMEDIATA = 'Até 10 min'
-const ENTREGA_RESUMO_MANUAL = 'Até 24h'
-const EXPLICACAO_ENTREGA_IMEDIATA =
+// ATENÇÃO -- texto voltado ao cliente, não mexer sem reler isto:
+// Pra alguns produtos (delivery_type = "manual"), a entrega de verdade é feita por uma pessoa
+// da equipe, que recebe um aviso no Telegram e responde com a chave (ver
+// api/mercadopago-webhook.js e api/telegram-webhook.js) -- às vezes levando mais que 10
+// minutos em dias de alta demanda. Isso é implementação interna. Pro cliente, a entrega é
+// SEMPRE apresentada como automática e dentro de até 10 minutos, sem citar Telegram, e-mail,
+// "equipe" ou qualquer pessoa/processo manual -- é por isso que os textos abaixo não variam
+// por delivery_type. Não reintroduza essa distinção aqui.
+const ENTREGA_RESUMO = 'Até 10 min'
+const EXPLICACAO_ENTREGA =
   'Nosso sistema realiza a entrega automaticamente. O prazo típico é de até 10 minutos após a confirmação do pagamento.'
-const EXPLICACAO_ENTREGA_MANUAL =
-  'Nossa equipe prepara e envia a entrega manualmente. Normalmente em até 10 minutos, podendo levar até 24h em dias de alta demanda.'
-const PRAZO_ENTREGA_FICHA_IMEDIATA = 'Até 10 minutos após a confirmação do pagamento'
-const PRAZO_ENTREGA_FICHA_MANUAL = 'Normalmente até 10 minutos, podendo levar até 24h em dias de alta demanda'
+const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
 
 function ProductDetailsModal({ produto, onFechar, onComprar }) {
   if (!produto) return null
 
-  // Entrega manual não usa o estoque de codigos_produto (ver Catalog.jsx) -- mostrar a
-  // contagem aqui confundiria o cliente com um número que não representa disponibilidade real.
-  const entregaManual = produto.delivery_type === 'manual'
-  const estoque = entregaManual ? null : produto.estoqueReal ?? produto.estoque
-  const entregaResumo = entregaManual ? ENTREGA_RESUMO_MANUAL : ENTREGA_RESUMO_IMEDIATA
-  const explicacaoEntrega = entregaManual ? EXPLICACAO_ENTREGA_MANUAL : EXPLICACAO_ENTREGA_IMEDIATA
-  const prazoEntregaFicha = entregaManual ? PRAZO_ENTREGA_FICHA_MANUAL : PRAZO_ENTREGA_FICHA_IMEDIATA
+  // Isto aqui é só uma decisão de UI (esconder um número de estoque que não existiria de
+  // verdade pra esses produtos) -- não expõe nem menciona nada sobre o processo de entrega
+  // pro cliente, então não conflita com o aviso acima.
+  const estoque = produto.delivery_type === 'manual' ? null : produto.estoqueReal ?? produto.estoque
   const itensIncluidos = Array.from(
     new Set([...(produto.beneficios || []), ...(produto.features || [])].map((item) => item.trim()).filter(Boolean)),
   )
@@ -78,7 +76,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
               <IconBolt className="icone-rapido-svg" />
               <div>
                 <strong>Entrega</strong>
-                <span>{entregaResumo}</span>
+                <span>{ENTREGA_RESUMO}</span>
               </div>
             </div>
             <div className="icone-rapido">
@@ -115,7 +113,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
 
           <div className="detalhe-bloco">
             <h4>Como funciona a entrega</h4>
-            <p className="detalhe-texto-livre">{explicacaoEntrega}</p>
+            <p className="detalhe-texto-livre">{EXPLICACAO_ENTREGA}</p>
             {produto.aviso_prazo && <p className="aviso-prazo aviso-prazo-inline">{produto.aviso_prazo}</p>}
           </div>
 
@@ -148,7 +146,7 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
                 </tr>
                 <tr>
                   <th>Prazo de entrega</th>
-                  <td>{prazoEntregaFicha}</td>
+                  <td>{PRAZO_ENTREGA_FICHA}</td>
                 </tr>
                 <tr>
                   <th>Garantia</th>

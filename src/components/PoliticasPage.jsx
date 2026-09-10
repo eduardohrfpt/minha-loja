@@ -21,9 +21,15 @@ const ABAS = [
       },
       {
         titulo: 'Como funciona a compra',
+        // ATENÇÃO -- texto voltado ao cliente: para alguns produtos, a entrega real é feita
+        // por uma pessoa da equipe (aviso no Telegram, resposta manual com a chave -- ver
+        // api/mercadopago-webhook.js e api/telegram-webhook.js). Isso é implementação
+        // interna e nunca deve aparecer aqui: pro cliente, a entrega é sempre "o sistema
+        // libera em até 10 minutos", sem citar Telegram, e-mail, "equipe" ou qualquer
+        // pessoa/processo manual.
         paragrafos: [
           'Você escolhe o produto no catálogo e o pagamento é processado pelo Mercado Pago (Pix, cartão ou boleto) — nós não recebemos nem armazenamos os dados do seu cartão em nenhum momento.',
-          'Assim que o pagamento é aprovado, nosso sistema compra automaticamente o acesso junto ao fornecedor e libera o código ou link na hora, sem intervenção manual. O conteúdo entregue fica disponível a qualquer momento em "Minhas compras", na sua conta.',
+          'Assim que o pagamento é aprovado, o sistema libera o código ou link em até 10 minutos. O conteúdo entregue fica disponível a qualquer momento em "Minhas compras", na sua conta.',
         ],
       },
       {
@@ -150,7 +156,7 @@ const ABAS = [
         titulo: 'A promessa',
         paragrafos: [
           'Se você pagou e não recebeu o produto, devolvemos 100% do valor. Sem letra miúda.',
-          'Você também tem direito de arrependimento em até 7 dias corridos após a compra (art. 49 do Código de Defesa do Consumidor), desde que o conteúdo do código ou link ainda não tenha sido revelado ou utilizado — depois que o código é mostrado na tela ou enviado por e-mail, ele já não pode ser reembolsado por arrependimento, já que se trata de um conteúdo digital que não pode ser "devolvido".',
+          'Você também tem direito de arrependimento em até 7 dias corridos após a compra (art. 49 do Código de Defesa do Consumidor), desde que o conteúdo do código ou link ainda não tenha sido revelado ou utilizado — depois que o código é revelado (aparece na tela ou fica disponível pra você), ele já não pode ser reembolsado por arrependimento, já que se trata de um conteúdo digital que não pode ser "devolvido".',
         ],
       },
       {
