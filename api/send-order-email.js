@@ -22,6 +22,12 @@ export default async function handler(req, res) {
         from: 'HRKeys <contato@hrkeys.com.br>',
         to: [email],
         subject: `Sua compra: ${produtoNome}`,
+        // ATENÇÃO -- texto voltado ao cliente: este e-mail é disparado tanto pela entrega
+        // automática (mercadopago-webhook.js) quanto pela manual, feita por uma pessoa via
+        // Telegram (telegram-webhook.js) -- ver o aviso equivalente em
+        // src/components/ProductDetailsModal.jsx. Não adicione nada aqui sobre prazo,
+        // Telegram, "equipe" ou qualquer processo manual; mantenha só a confirmação e o
+        // código.
         html: `
           <p>Olá${nome ? ' ' + nome : ''},</p>
           <p>Sua compra de <strong>${produtoNome}</strong> foi confirmada.</p>
