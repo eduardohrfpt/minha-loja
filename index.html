@@ -46,6 +46,50 @@
         Tawk_API.locale = "pt-BR";
         Tawk_API.hideWidget();
       };
+      // O Tawk troca o título da aba (ex: "1 nova mensagem") e o favicon quando chega
+      // mensagem não lida, mesmo com o widget escondido. Não existe um método na API JS pra
+      // desligar isso -- o único jeito documentado é a opção "Disable browser tab
+      // notification" no painel (Administration > Chat Widget > Widget Behavior >
+      // Notification settings), e relatos da comunidade do Tawk dizem que ela nem sempre
+      // cobre 100% dos casos. Por segurança, guardamos o título/favicon originais aqui (antes
+      // do script do Tawk sequer carregar) e um MutationObserver devolve qualquer alteração
+      // que apareça neles, venha do Tawk ou de outra coisa.
+      (function () {
+        var tituloOriginal = document.title;
+        var elementoTitulo = document.querySelector("title");
+        if (elementoTitulo) {
+          new MutationObserver(function () {
+            if (document.title !== tituloOriginal) document.title = tituloOriginal;
+          }).observe(elementoTitulo, { childList: true, characterData: true, subtree: true });
+        }
+
+        var linkFavicon = document.querySelector('link[rel~="icon"]');
+        if (linkFavicon) {
+          var hrefFaviconOriginal = linkFavicon.getAttribute("href");
+          new MutationObserver(function () {
+            if (linkFavicon.getAttribute("href") !== hrefFaviconOriginal) {
+              linkFavicon.setAttribute("href", hrefFaviconOriginal);
+            }
+          }).observe(linkFavicon, { attributes: true, attributeFilter: ["href"] });
+        }
+
+        // Em vez de alterar o <link> existente, o Tawk pode inserir um novo -- remove
+        // qualquer link de ícone extra que não seja o nosso.
+        new MutationObserver(function (mutacoes) {
+          mutacoes.forEach(function (mutacao) {
+            mutacao.addedNodes.forEach(function (node) {
+              if (
+                node.nodeType === 1 &&
+                node.tagName === "LINK" &&
+                /icon/i.test(node.getAttribute("rel") || "") &&
+                node !== linkFavicon
+              ) {
+                node.remove();
+              }
+            });
+          });
+        }).observe(document.head, { childList: true });
+      })();
       (function () {
         var s1 = document.createElement("script"),
           s0 = document.getElementsByTagName("script")[0];
