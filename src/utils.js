@@ -38,3 +38,10 @@ export function abrirChatSuporte() {
     abrir()
   }
 }
+
+// Esconde o chat do Tawk.to de volta. Chamada sempre que o cliente sai da tela de detalhes
+// da compra (fecha o modal, troca de rota ou desloga) pra não deixar o widget aberto/visível
+// fora daquele contexto.
+export function esconderChatSuporte() {
+  window.Tawk_API?.hideWidget?.()
+}

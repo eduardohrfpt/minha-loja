@@ -31,11 +31,19 @@
     <script type="text/javascript">
       var Tawk_API = Tawk_API || {},
         Tawk_LoadStart = new Date();
-      // Força o idioma do widget pt-BR, independente do idioma do navegador do visitante.
+      // Tenta forçar pt-BR independente do idioma do navegador do visitante. `locale` não é
+      // um método documentado na API oficial do Tawk (https://developer.tawk.to/jsapi/) --
+      // setamos antes do script carregar e de novo dentro do onLoad (ver abaixo) porque isso
+      // é o que muda o idioma dos textos auto-gerados pelo próprio Tawk (ex: título da aba
+      // "X nova(s) mensagem(ns)"). Mas o conteúdo do widget em si (saudação, botões de
+      // resposta rápida, placeholder do campo de texto, "Powered by tawk.to") continua vindo
+      // em inglês -- isso só se resolve configurando o idioma padrão do widget no painel:
+      // Administration > Chat Widget > Widget Content > Language.
       Tawk_API.locale = "pt-BR";
       // Widget escondido por padrão em todo o site -- só aparece quando o próprio código
       // da aplicação chama Tawk_API.showWidget() (ex: botão de suporte em "Minhas compras").
       Tawk_API.onLoad = function () {
+        Tawk_API.locale = "pt-BR";
         Tawk_API.hideWidget();
       };
       (function () {
