@@ -677,7 +677,7 @@ span.card-banner-imagem {
    que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
    meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si. */
 .card h3 {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
@@ -695,11 +695,12 @@ span.card-banner-imagem {
   color: var(--texto-suave);
 }
 
-/* Puxa a marca pra mais perto do nome (mesma relação visual "título + subtítulo" de antes),
-   só dentro do card do catálogo -- .card-marca também é usado em outras telas
-   (ProductDetailsModal, MyOrdersModal) com layout próprio, então o ajuste fica escopado aqui
-   em vez de ir na classe compartilhada. */
+/* Marca um pouco maior + puxada pra mais perto do nome (mesma relação visual "título +
+   subtítulo" de antes), só dentro do card do catálogo -- .card-marca também é usado em outras
+   telas (ProductDetailsModal, MyOrdersModal) com layout próprio, então o ajuste fica escopado
+   aqui em vez de ir na classe compartilhada. */
 .card-corpo .card-marca {
+  font-size: 16px;
   margin-top: -12px;
 }
 
@@ -707,7 +708,7 @@ span.card-banner-imagem {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   width: fit-content;
   /* width:fit-content por si só cai no alinhamento padrão (esquerda) dentro do .card-corpo
@@ -767,11 +768,18 @@ span.card-banner-imagem {
   color: var(--verde-escuro);
 }
 
-/* Texto "Você paga bem menos que o preço oficial" um pouco maior e mais em destaque, só no
-   card do catálogo -- .preco-referencia-legenda também aparece no modal de detalhes, que não
-   faz parte deste ajuste. */
+/* Preço riscado e texto "Você paga bem menos que o preço oficial" maiores e mais em
+   destaque, só no card do catálogo -- essas classes também aparecem no modal de detalhes, que
+   não faz parte deste ajuste. Reforça o min-height do bloco (34px base) porque o texto maior
+   ocupa mais altura. */
+.card-corpo .preco-referencia-bloco {
+  min-height: 42px;
+}
+.card-corpo .preco-referencia-valor {
+  font-size: 15px;
+}
 .card-corpo .preco-referencia-legenda {
-  font-size: 13px;
+  font-size: 15px;
 }
 
 /* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
@@ -800,8 +808,17 @@ span.card-banner-imagem {
    já ocupa a largura toda; text-align:center não afeta itens flex, por isso o
    justify-content aqui). Escopado pra não mudar a lista da Hero nem o modal de detalhes, que
    também usam .precos-linha com seus próprios layouts. */
+/* Também aumenta o min-height e as fontes do preço riscado + etiqueta de desconto, mesmo
+   raciocínio das outras classes de preço acima: maiores só dentro do card do catálogo. */
 .card-corpo .precos-linha {
   justify-content: center;
+  min-height: 26px;
+}
+.card-corpo .preco-antigo {
+  font-size: 15px;
+}
+.card-corpo .etiqueta-desconto {
+  font-size: 13px;
 }
 
 .preco-antigo {
@@ -825,10 +842,10 @@ span.card-banner-imagem {
   color: var(--titulo);
 }
 
-/* Preço final um pouco maior e mais em destaque, só no card do catálogo -- .preco-final
-   também aparece no modal de detalhes, que não faz parte deste ajuste. */
+/* Preço final maior e mais em destaque, só no card do catálogo -- .preco-final também aparece
+   no modal de detalhes, que não faz parte deste ajuste. */
 .card-corpo .preco-final {
-  font-size: 27px;
+  font-size: 30px;
 }
 
 .card-acoes {
