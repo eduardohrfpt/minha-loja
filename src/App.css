@@ -667,13 +667,17 @@ span.card-banner-imagem {
   gap: 16px;
   padding: 24px 24px 28px;
   flex: 1;
+  /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
+     só ficar com o texto centralizado, e sim o próprio bloco centralizado (o badge de status,
+     os botões), têm align-self/justify-content próprios abaixo. */
+  text-align: center;
 }
 
 /* Reserva sempre a altura de 3 linhas pro nome do produto (com "..." se passar disso), pra
    que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
    meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si. */
 .card h3 {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
@@ -681,7 +685,8 @@ span.card-banner-imagem {
   -webkit-box-orient: vertical;
   overflow: hidden;
   /* line-clamp só limita o máximo -- sem isso, nomes de 1 linha ("Disney+") deixariam o resto
-     do card mais alto que nomes de 3 linhas. 3.9em = 3 linhas de 1.3 de altura. */
+     do card mais alto que nomes de 3 linhas. 3.9em = 3 linhas de 1.3 de altura (acompanha o
+     font-size do h3 automaticamente, por estar em em). */
   min-height: 3.9em;
 }
 
@@ -705,6 +710,11 @@ span.card-banner-imagem {
   font-size: 12px;
   font-weight: 600;
   width: fit-content;
+  /* width:fit-content por si só cai no alinhamento padrão (esquerda) dentro do .card-corpo
+     centralizado -- sem isso o badge ficaria colado na borda esquerda em vez de centralizado
+     junto com o resto do texto. Só existe no card do catálogo (não é uma classe compartilhada
+     com o modal de detalhes). */
+  align-self: center;
 }
 .disponibilidade i {
   width: 7px;
@@ -740,7 +750,7 @@ span.card-banner-imagem {
   /* No card, este bloco agora é sempre renderizado (mesmo vazio, quando o produto não tem
      preco_referencia) só pra reservar essa altura -- sem isso, o preço e os botões dos cards
      sem preço de referência ficariam mais pra cima que os dos cards com. */
-  min-height: 34px;
+  min-height: 36px;
 }
 
 .preco-referencia-valor {
@@ -755,6 +765,13 @@ span.card-banner-imagem {
   line-height: 1.3;
   font-weight: 600;
   color: var(--verde-escuro);
+}
+
+/* Texto "Você paga bem menos que o preço oficial" um pouco maior e mais em destaque, só no
+   card do catálogo -- .preco-referencia-legenda também aparece no modal de detalhes, que não
+   faz parte deste ajuste. */
+.card-corpo .preco-referencia-legenda {
+  font-size: 13px;
 }
 
 /* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
@@ -779,6 +796,14 @@ span.card-banner-imagem {
   min-height: 22px;
 }
 
+/* No card do catálogo, centraliza o preço antigo + etiqueta de desconto como grupo (a linha
+   já ocupa a largura toda; text-align:center não afeta itens flex, por isso o
+   justify-content aqui). Escopado pra não mudar a lista da Hero nem o modal de detalhes, que
+   também usam .precos-linha com seus próprios layouts. */
+.card-corpo .precos-linha {
+  justify-content: center;
+}
+
 .preco-antigo {
   text-decoration: line-through;
   font-size: 13px;
@@ -800,15 +825,23 @@ span.card-banner-imagem {
   color: var(--titulo);
 }
 
+/* Preço final um pouco maior e mais em destaque, só no card do catálogo -- .preco-final
+   também aparece no modal de detalhes, que não faz parte deste ajuste. */
+.card-corpo .preco-final {
+  font-size: 27px;
+}
+
 .card-acoes {
   display: flex;
   gap: 10px;
   margin-top: auto;
   padding-top: 4px;
+  /* Centraliza o par de botões como grupo, em vez de esticar cada um pra metade da largura
+     do card. */
+  justify-content: center;
 }
 .card-acoes button {
-  flex: 1;
-  padding: 12px 20px;
+  padding: 12px 24px;
 }
 
 .acoes-admin {
