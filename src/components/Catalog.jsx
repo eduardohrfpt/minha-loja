@@ -326,68 +326,72 @@ function Catalog({
                   ))}
                 </div>
               )}
-              <div className="card-topo">
-                <IconeProduto produto={produto} className="icone-marca" />
-                <div className="card-topo-texto">
-                  <h3>{produto.name}</h3>
-                  <span className="card-marca">{produto.brand}</span>
-                </div>
+
+              {/* Imagem/ícone como banner, ocupando a largura toda no topo do card (padrão
+                  GENIUZ Labs) -- em vez do ícone pequeno ao lado do nome de antes. */}
+              <div className="card-banner">
+                <IconeProduto produto={produto} className="card-banner-imagem" />
               </div>
 
-              <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
-                <i />
-                {statusTexto}
-              </span>
+              <div className="card-corpo">
+                <h3>{produto.name}</h3>
+                <span className="card-marca">{produto.brand}</span>
 
-              {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
-                  card -- se só aparecesse quando preco_referencia existisse, os cards sem
-                  preço de referência ficariam com o preço/botões mais pra cima que os demais,
-                  quebrando o alinhamento entre os cards da mesma linha. */}
-              <div className="preco-referencia-bloco">
-                {produto.preco_referencia > 0 && (
-                  <>
-                    <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
-                    <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
-                  </>
-                )}
-              </div>
-              <div className="precos">
-                <div className="precos-linha">
-                  {produto.discount > 0 && (
-                    <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
-                  )}
-                  {produto.discount > 0 && (
-                    <span className="etiqueta-desconto">-{produto.discount}%</span>
+                <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
+                  <i />
+                  {statusTexto}
+                </span>
+
+                {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
+                    card -- se só aparecesse quando preco_referencia existisse, os cards sem
+                    preço de referência ficariam com o preço/botões mais pra cima que os
+                    demais, quebrando o alinhamento entre os cards da mesma linha. */}
+                <div className="preco-referencia-bloco">
+                  {produto.preco_referencia > 0 && (
+                    <>
+                      <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+                      <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+                    </>
                   )}
                 </div>
-                <span className="preco-final">{formatarPreco(produto.price)}</span>
-              </div>
+                <div className="precos">
+                  <div className="precos-linha">
+                    {produto.discount > 0 && (
+                      <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                    )}
+                    {produto.discount > 0 && (
+                      <span className="etiqueta-desconto">-{produto.discount}%</span>
+                    )}
+                  </div>
+                  <span className="preco-final">{formatarPreco(produto.price)}</span>
+                </div>
 
-              <div className="card-acoes">
-                <button
-                  className="botao-secundario"
-                  onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
-                >
-                  Detalhes
-                </button>
-                <button
-                  className="botao-primario"
-                  disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
-                  onClick={() => comprarAgora(produto)}
-                >
-                  {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
-                </button>
-              </div>
-
-              {adminAtivo && (
-                <div className="acoes-admin">
-                  <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
-                  <button onClick={() => setProdutoEstoque(produto)}>Estoque de códigos</button>
-                  <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
-                    Remover
+                <div className="card-acoes">
+                  <button
+                    className="botao-secundario"
+                    onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
+                  >
+                    Detalhes
+                  </button>
+                  <button
+                    className="botao-primario"
+                    disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
+                    onClick={() => comprarAgora(produto)}
+                  >
+                    {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
                   </button>
                 </div>
-              )}
+
+                {adminAtivo && (
+                  <div className="acoes-admin">
+                    <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
+                    <button onClick={() => setProdutoEstoque(produto)}>Estoque de códigos</button>
+                    <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
+                      Remover
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )
         })}
