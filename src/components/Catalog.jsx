@@ -328,7 +328,7 @@ function Catalog({
               )}
               <div className="card-topo">
                 <IconeProduto produto={produto} className="icone-marca" />
-                <div>
+                <div className="card-topo-texto">
                   <h3>{produto.name}</h3>
                   <span className="card-marca">{produto.brand}</span>
                 </div>
@@ -339,12 +339,18 @@ function Catalog({
                 {statusTexto}
               </span>
 
-              {produto.preco_referencia > 0 && (
-                <div className="preco-referencia-bloco">
-                  <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
-                  <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
-                </div>
-              )}
+              {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
+                  card -- se só aparecesse quando preco_referencia existisse, os cards sem
+                  preço de referência ficariam com o preço/botões mais pra cima que os demais,
+                  quebrando o alinhamento entre os cards da mesma linha. */}
+              <div className="preco-referencia-bloco">
+                {produto.preco_referencia > 0 && (
+                  <>
+                    <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+                    <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+                  </>
+                )}
+              </div>
               <div className="precos">
                 <div className="precos-linha">
                   {produto.discount > 0 && (

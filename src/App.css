@@ -569,19 +569,19 @@
 
 .grade {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
 }
 
 .card {
   position: relative;
   border: 1px solid var(--borda);
   border-radius: var(--raio);
-  padding: 28px 22px;
+  padding: 34px 28px;
   background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   box-shadow: var(--sombra-suave);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
@@ -593,8 +593,8 @@
 
 .selos {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 16px;
+  right: 16px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -614,15 +614,15 @@
 .card-topo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .icone-marca {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  font-size: 24px;
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
   background: var(--bg-alt);
   border: 1px solid var(--borda);
   border-radius: var(--raio-sm);
@@ -637,13 +637,30 @@
   object-fit: cover;
 }
 
+/* min-width:0 deixa o bloco de texto encolher dentro do flex e quebrar linha normalmente,
+   em vez de espremer o ícone ao lado quando o nome do produto é longo. */
+.card-topo-texto {
+  min-width: 0;
+}
+
+/* Reserva sempre a altura de 3 linhas pro nome do produto (com "..." se passar disso), pra
+   que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
+   meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si. */
 .card h3 {
-  font-size: 16px;
-  margin-bottom: 2px;
+  font-size: 18px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* line-clamp só limita o máximo -- sem isso, nomes de 1 linha ("Disney+") deixariam o resto
+     do card mais alto que nomes de 3 linhas. 3.9em = 3 linhas de 1.3 de altura. */
+  min-height: 3.9em;
 }
 
 .card-marca {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--texto-suave);
 }
 
@@ -686,16 +703,22 @@
   flex-direction: column;
   gap: 2px;
   margin-bottom: 2px;
+  /* No card, este bloco agora é sempre renderizado (mesmo vazio, quando o produto não tem
+     preco_referencia) só pra reservar essa altura -- sem isso, o preço e os botões dos cards
+     sem preço de referência ficariam mais pra cima que os dos cards com. */
+  min-height: 34px;
 }
 
 .preco-referencia-valor {
   text-decoration: line-through;
   font-size: 13px;
+  line-height: 1.3;
   color: var(--texto-suave);
 }
 
 .preco-referencia-legenda {
   font-size: 11px;
+  line-height: 1.3;
   font-weight: 600;
   color: var(--verde-escuro);
 }
@@ -716,6 +739,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Reserva a altura da etiqueta de desconto mesmo quando não há desconto (discount = 0) --
+     mesmo raciocínio do .preco-referencia-bloco acima: mantém o preço final e os botões
+     alinhados entre cards com e sem desconto. */
+  min-height: 22px;
 }
 
 .preco-antigo {
@@ -734,18 +761,20 @@
 }
 
 .preco-final {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--titulo);
 }
 
 .card-acoes {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 4px;
 }
 .card-acoes button {
   flex: 1;
+  padding: 12px 20px;
 }
 
 .acoes-admin {
