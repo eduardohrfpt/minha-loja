@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { formatarPreco } from '../utils'
 import { IconCheck, IconShield, IconLock, IconHeadset, IconBolt, IconPackage } from './icons'
 import IconeProduto from './IconeProduto'
@@ -32,8 +33,12 @@ const EXPLICACAO_ENTREGA =
   'Nosso sistema realiza a entrega automaticamente. O prazo típico é de até 10 minutos após a confirmação do pagamento.'
 const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
 
-function ProductDetailsModal({ produto, onFechar, onComprar }) {
-  if (!produto) return null
+// Fica num componente à parte (em vez de calcular tudo direto em ProductDetailsModal, antes de
+// um "if (!produto) return null") porque o AnimatePresence logo abaixo precisa continuar
+// renderizando a árvore durante a animação de saída -- sem esse "return null" antecipado, o
+// modal sumiria na hora em vez de fechar com transição.
+function ConteudoModalProduto({ produto, onFechar, onComprar }) {
+  const reduzirMovimento = useReducedMotion()
 
   // Isto aqui é só uma decisão de UI (esconder um número de estoque que não existiria de
   // verdade pra esses produtos) -- não expõe nem menciona nada sobre o processo de entrega
@@ -48,9 +53,23 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
     .map((passo) => passo.trim().replace(/^\d+\s*[-.).]\s*/, ''))
     .filter(Boolean)
 
-  return createPortal(
-    <div className="overlay" onClick={onFechar}>
-      <div className="modal-detalhes-completo" onClick={(e) => e.stopPropagation()}>
+  return (
+    <motion.div
+      className="overlay"
+      onClick={onFechar}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reduzirMovimento ? 0 : 0.18 }}
+    >
+      <motion.div
+        className="modal-detalhes-completo"
+        onClick={(e) => e.stopPropagation()}
+        initial={reduzirMovimento ? false : { opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={reduzirMovimento ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
+        transition={{ duration: reduzirMovimento ? 0.12 : 0.24, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="detalhe-scroll">
           <div className="detalhe-imagem-grande">
             <IconeProduto produto={produto} className="detalhe-imagem-conteudo" />
@@ -199,8 +218,16 @@ function ProductDetailsModal({ produto, onFechar, onComprar }) {
             </button>
           </div>
         </div>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function ProductDetailsModal({ produto, onFechar, onComprar }) {
+  return createPortal(
+    <AnimatePresence>
+      {produto && <ConteudoModalProduto produto={produto} onFechar={onFechar} onComprar={onComprar} />}
+    </AnimatePresence>,
     document.body,
   )
 }

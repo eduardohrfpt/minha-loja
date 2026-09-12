@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import { IconTag, IconBolt, IconHeadset, IconLock, IconRefresh, IconShield } from './icons'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const beneficios = [
   { Icone: IconTag, titulo: 'Até 70% mais barato', texto: 'Compra no atacado repassada direto pra você.' },
@@ -10,16 +12,19 @@ const beneficios = [
 ]
 
 function WhyBuy() {
+  const containerRef = useRef(null)
+  useScrollReveal(containerRef)
+
   return (
-    <section id="vantagens" className="secao secao-alt">
-      <div className="secao-cabecalho">
+    <section id="vantagens" className="secao secao-alt" ref={containerRef}>
+      <div className="secao-cabecalho" data-reveal>
         <h2>Por que comprar com a gente</h2>
         <p>Tudo o que você precisa pra assinar com tranquilidade.</p>
       </div>
 
       <div className="beneficios">
         {beneficios.map(({ Icone, titulo, texto }) => (
-          <div className="beneficio" key={titulo}>
+          <div className="beneficio" key={titulo} data-reveal>
             <div className="icone-circulo">
               <Icone />
             </div>

@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
@@ -7,6 +8,14 @@ import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
 import { IconSearch, IconShield, IconBolt, IconPackage } from './icons'
+import { useScrollReveal } from '../hooks/useScrollReveal'
+
+// Sutil, e não atrapalha cliques rápidos: whileHover/whileTap são só transform (escala), não
+// mudam layout nem atrasam o onClick -- o clique dispara na hora normal do navegador, a
+// animação só acompanha visualmente.
+const HOVER_BOTAO_CARD = { scale: 1.035 }
+const TAP_BOTAO_CARD = { scale: 0.97 }
+const TRANSICAO_BOTAO_CARD = { duration: 0.15, ease: 'easeOut' }
 
 // ATENÇÃO -- texto voltado ao cliente: "Até 10 min" é sempre genérico e igual pra todo
 // produto, igual ao ENTREGA_RESUMO de ProductDetailsModal.jsx -- nunca varia por
@@ -96,6 +105,12 @@ function Catalog({
     if (!termo) return produtos
     return produtos.filter((produto) => produto.name.toLowerCase().includes(termo))
   }, [produtos, busca])
+
+  // Os cards só existem no DOM depois que produtosFiltrados é preenchido (carregamento do
+  // Supabase é assíncrono) -- por isso o efeito de scroll reveal depende dele e roda de novo
+  // sempre que a lista muda (carrega, filtra pela busca etc.).
+  const containerRef = useRef(null)
+  useScrollReveal(containerRef, [produtosFiltrados])
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -270,8 +285,8 @@ function Catalog({
   }
 
   return (
-    <section id="produtos" className="secao">
-      <div className="secao-cabecalho">
+    <section id="produtos" className="secao" ref={containerRef}>
+      <div className="secao-cabecalho" data-reveal>
         <h2>Catálogo</h2>
         <p>Todas as assinaturas disponíveis, com desconto já aplicado.</p>
       </div>
@@ -332,7 +347,7 @@ function Catalog({
                 : 'Disponível'
 
           return (
-            <div className="card" key={produto.id}>
+            <div className="card" key={produto.id} data-reveal>
               {produto.badges?.length > 0 && (
                 <div className="selos">
                   {produto.badges.map((badge) => (
@@ -403,19 +418,25 @@ function Catalog({
                 </div>
 
                 <div className="card-acoes">
-                  <button
+                  <motion.button
                     className="botao-secundario"
+                    whileHover={HOVER_BOTAO_CARD}
+                    whileTap={TAP_BOTAO_CARD}
+                    transition={TRANSICAO_BOTAO_CARD}
                     onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
                   >
                     Detalhes
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     className="botao-primario"
+                    whileHover={HOVER_BOTAO_CARD}
+                    whileTap={TAP_BOTAO_CARD}
+                    transition={TRANSICAO_BOTAO_CARD}
                     disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
                     onClick={() => comprarAgora(produto)}
                   >
                     {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
-                  </button>
+                  </motion.button>
                 </div>
 
                 {adminAtivo && (

@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { IconChevronDown } from './icons'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const perguntas = [
   {
@@ -33,25 +35,40 @@ const perguntas = [
 
 function Faq() {
   const [aberta, setAberta] = useState(null)
+  const containerRef = useRef(null)
+  useScrollReveal(containerRef)
 
   function alternar(indice) {
     setAberta((atual) => (atual === indice ? null : indice))
   }
 
   return (
-    <section className="secao secao-estreita">
-      <div className="secao-cabecalho">
+    <section className="secao secao-estreita" ref={containerRef}>
+      <div className="secao-cabecalho" data-reveal>
         <h2>Dúvidas frequentes</h2>
       </div>
 
       <div className="faq">
         {perguntas.map((item, indice) => (
-          <div className="faq-item" key={item.pergunta}>
+          <div className="faq-item" key={item.pergunta} data-reveal>
             <button className="faq-pergunta" onClick={() => alternar(indice)}>
               <span>{item.pergunta}</span>
               <IconChevronDown className={`faq-seta ${aberta === indice ? 'aberta' : ''}`} />
             </button>
-            {aberta === indice && <p className="faq-resposta">{item.resposta}</p>}
+            <AnimatePresence initial={false}>
+              {aberta === indice && (
+                <motion.div
+                  key="resposta"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <p className="faq-resposta">{item.resposta}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         ))}
       </div>
