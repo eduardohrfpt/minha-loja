@@ -664,8 +664,8 @@ span.card-banner-imagem {
 .card-corpo {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px 24px 28px;
+  gap: 12px;
+  padding: 20px 22px 24px;
   flex: 1;
   /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
      só ficar com o texto centralizado, e sim o próprio bloco centralizado (o badge de status,
@@ -695,13 +695,40 @@ span.card-banner-imagem {
   color: var(--texto-suave);
 }
 
-/* Marca um pouco maior + puxada pra mais perto do nome (mesma relação visual "título +
-   subtítulo" de antes), só dentro do card do catálogo -- .card-marca também é usado em outras
+/* Marca um pouco maior, só dentro do card do catálogo -- .card-marca também é usado em outras
    telas (ProductDetailsModal, MyOrdersModal) com layout próprio, então o ajuste fica escopado
    aqui em vez de ir na classe compartilhada. */
 .card-corpo .card-marca {
   font-size: 16px;
-  margin-top: -12px;
+}
+
+/* Reserva a altura de uma linha de marca mesmo quando ela não aparece (produto com marca
+   redundante ao nome -- ver marcaRedundante em Catalog.jsx) -- sem isso, cards com marca
+   visível ficariam com o resto do conteúdo mais pra baixo que cards sem marca, quebrando o
+   alinhamento entre eles. Também puxa a marca pra mais perto do nome, quando aparece (mesma
+   relação visual "título + subtítulo" de antes). */
+.card-marca-bloco {
+  min-height: 25px;
+  margin-top: -6px;
+}
+
+/* Bloco compacto "Entrega" + "Duração", entre o nome e o status de disponibilidade. */
+.card-info-rapida {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+.card-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-info-icone {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .disponibilidade {

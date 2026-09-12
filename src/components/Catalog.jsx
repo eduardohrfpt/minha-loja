@@ -6,7 +6,23 @@ import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
-import { IconSearch, IconShield } from './icons'
+import { IconSearch, IconShield, IconBolt, IconPackage } from './icons'
+
+// ATENÇÃO -- texto voltado ao cliente: "Até 10 min" é sempre genérico e igual pra todo
+// produto, igual ao ENTREGA_RESUMO de ProductDetailsModal.jsx -- nunca varia por
+// delivery_type nem detalha o processo real de entrega (ver aviso em ProductDetailsModal.jsx).
+const ENTREGA_RESUMO_CARD = 'Até 10 min'
+
+// A marca só agrega informação quando NÃO está contida no nome do produto (ex: "Notion Plus"
+// já deixa claro que é da Notion; "Assinatura Anual Premium" com marca "Spotify" não deixa,
+// então nesse caso vale mostrar a marca). Comparação simples, sem acento/maiúsculas, já cobre
+// os casos reais do catálogo.
+function marcaRedundante(produto) {
+  if (!produto.brand) return true
+  const nome = (produto.name || '').toLowerCase()
+  const marca = produto.brand.toLowerCase()
+  return nome.includes(marca)
+}
 
 const formVazio = {
   name: '',
@@ -335,7 +351,27 @@ function Catalog({
 
               <div className="card-corpo">
                 <h3>{produto.name}</h3>
-                <span className="card-marca">{produto.brand}</span>
+
+                {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
+                    card -- ver comentário igual mais abaixo sobre .preco-referencia-bloco.
+                    A marca só aparece quando agrega informação além do nome (ver
+                    marcaRedundante acima). */}
+                <div className="card-marca-bloco">
+                  {!marcaRedundante(produto) && <span className="card-marca">{produto.brand}</span>}
+                </div>
+
+                <div className="card-info-rapida">
+                  <span className="card-info-item">
+                    <IconBolt className="card-info-icone" />
+                    {ENTREGA_RESUMO_CARD}
+                  </span>
+                  {produto.duration && (
+                    <span className="card-info-item">
+                      <IconPackage className="card-info-icone" />
+                      {produto.duration}
+                    </span>
+                  )}
+                </div>
 
                 <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
                   <i />
