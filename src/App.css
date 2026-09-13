@@ -345,6 +345,19 @@
   }
 }
 
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 28px;
+    letter-spacing: -0.5px;
+  }
+  .hero-destaque {
+    font-size: 17px;
+  }
+  .hero-subtitulo {
+    font-size: 15px;
+  }
+}
+
 /* Barra de confiança */
 
 .barra-confianca {
@@ -425,6 +438,15 @@
   color: var(--texto-suave);
   font-size: 16px;
   line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .secao-cabecalho h2 {
+    font-size: 25px;
+  }
+  .secao-cabecalho p {
+    font-size: 14px;
+  }
 }
 
 /* Como funciona */
@@ -1626,6 +1648,15 @@ span.card-banner-imagem {
   margin-bottom: 12px;
 }
 
+@media (max-width: 480px) {
+  .cta-final {
+    padding: 56px 24px;
+  }
+  .cta-final h2 {
+    font-size: 23px;
+  }
+}
+
 .cta-final p {
   opacity: 0.9;
   line-height: 1.6;
@@ -2330,6 +2361,12 @@ span.card-banner-imagem {
   font-size: 32px;
   font-weight: 800;
   color: var(--titulo);
+}
+
+@media (max-width: 480px) {
+  .politicas-cabecalho h1 {
+    font-size: 25px;
+  }
 }
 
 .politicas-abas {
