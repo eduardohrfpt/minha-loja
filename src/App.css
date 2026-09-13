@@ -333,15 +333,56 @@
   }
   .hero {
     grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+  /* Remove a caixa de .hero-texto pra que seus filhos virem itens diretos do grid de
+     .hero, junto com .hero-card -- só assim dá pra reordenar o card entre eles via
+     `order`, já que ele é irmão de .hero-texto no HTML, não filho. */
+  .hero-texto {
+    display: contents;
+  }
+  .banner-destaque {
+    order: 1;
+    margin-bottom: 0;
   }
   .hero h1 {
+    order: 2;
     font-size: 34px;
+    margin-bottom: 0;
   }
   .hero-destaque {
+    order: 3;
     font-size: 19px;
+    margin-bottom: 0;
   }
   .hero-card {
-    display: none;
+    order: 4;
+    min-width: 0;
+  }
+  /* Nomes de produto longos (ex: "Lovable Pro Lite + 300 Créditos (12 meses)") quebravam em
+     varias linhas estreitas ao lado do preço, já que o card ganha a largura toda da tela aqui
+     -- trunca com reticências pra manter cada item numa linha só. min-width:0 em cada nível
+     flex/grid é necessário pra permitir encolher abaixo da largura do texto sem quebra (senão
+     o texto "empurra" a largura mínima do card, e da .hero inteira, pra além da tela). */
+  .hero-card-item {
+    min-width: 0;
+  }
+  .hero-card-info {
+    min-width: 0;
+  }
+  .hero-card-info strong {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hero-subtitulo {
+    order: 5;
+    margin-bottom: 0;
+  }
+  .hero-acoes {
+    order: 6;
   }
 }
 
