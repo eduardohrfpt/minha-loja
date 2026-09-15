@@ -159,24 +159,25 @@
 
 /* Hero */
 
-/* Só reserva o espaço pra não ficar embaixo do cabeçalho fixo e separar da próxima seção --
-   sem fundo, pra não virar uma faixa cinza maior que o conteúdo da .hero em si. */
+/* Fundo esticado de borda a borda da tela -- só o conteúdo (.hero, abaixo) fica limitado a
+   1180px e centralizado, pra manter o mesmo respiro interno de antes. */
 .hero-secao {
   position: relative;
   isolation: isolate;
-  padding: 96px 24px 56px;
+  padding: 96px 0 56px;
+  background: var(--bg-alt);
 }
 
-/* Glow radial suave nos cantos, atrás de toda a seção (não do texto) -- profundidade sem
-   poluir. z-index negativo + isolation no pai garante que fique atrás do conteúdo. */
+/* Glow radial suave nos dois cantos superiores, simétrico -- atrás de todo o conteúdo. z-index
+   negativo + isolation no pai garante que fique atrás do conteúdo. */
 .hero-secao::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(640px circle at 10% 15%, rgba(16, 185, 129, 0.12), transparent 60%),
-    radial-gradient(640px circle at 90% 85%, rgba(15, 43, 70, 0.1), transparent 60%);
+    radial-gradient(640px circle at 6% 20%, rgba(16, 185, 129, 0.12), transparent 60%),
+    radial-gradient(640px circle at 94% 20%, rgba(16, 185, 129, 0.12), transparent 60%);
   pointer-events: none;
 }
 
@@ -184,8 +185,6 @@
   max-width: 1180px;
   margin: 0 auto;
   padding: 48px 36px;
-  background: var(--bg-alt);
-  border-radius: var(--raio-lg);
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
