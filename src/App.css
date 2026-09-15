@@ -243,7 +243,7 @@
 
 .hero-card {
   position: relative;
-  background: #fff;
+  background: var(--bg-alt);
   border: 1px solid var(--borda);
   border-radius: var(--raio);
   padding: 24px 20px 20px;
@@ -458,11 +458,8 @@
   }
 }
 
-/* Fundo um pouco mais contrastante que --bg-alt (usado em botões/hover/etc por toda a página),
-   só pra essas faixas alternadas ficarem visíveis o suficiente para guiar o olhar ao rolar. */
 .secao-alt {
   max-width: none;
-  background: #eef1f4;
   border-top: 1px solid var(--borda);
 }
 .secao-alt > * {
