@@ -774,8 +774,8 @@ span.card-banner-imagem {
 .card-corpo {
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  padding: 8px 22px 8px;
+  gap: 6px;
+  padding: 2px 22px 2px;
   flex: 1;
   /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
      só ficar com o texto centralizado, e sim o próprio bloco centralizado (o badge de status,
@@ -783,21 +783,23 @@ span.card-banner-imagem {
   text-align: center;
 }
 
-/* Reserva sempre a altura de 3 linhas pro nome do produto (com "..." se passar disso), pra
+/* Reserva sempre a altura de 2 linhas pro nome do produto (com "..." se passar disso), pra
    que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
-   meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si. */
+   meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si.
+   Reduzido de 3 pra 2 linhas porque, com o nome no dobro do tamanho, 3 linhas não cabiam mais
+   no card sem crescer a altura total -- ver commit que dobrou o font-size do h3. */
 .card h3 {
-  font-size: 24px;
+  font-size: 48px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   /* line-clamp só limita o máximo -- sem isso, nomes de 1 linha ("Disney+") deixariam o resto
-     do card mais alto que nomes de 3 linhas. 3.9em = 3 linhas de 1.3 de altura (acompanha o
+     do card mais alto que nomes de 2 linhas. 2.6em = 2 linhas de 1.3 de altura (acompanha o
      font-size do h3 automaticamente, por estar em em). */
-  min-height: 3.9em;
+  min-height: 2.6em;
 }
 
 .card-marca {
@@ -818,8 +820,8 @@ span.card-banner-imagem {
    alinhamento entre eles. Também puxa a marca pra mais perto do nome, quando aparece (mesma
    relação visual "título + subtítulo" de antes). */
 .card-marca-bloco {
-  min-height: 25px;
-  margin-top: -6px;
+  min-height: 0;
+  margin-top: 0;
 }
 
 /* Bloco compacto "Entrega" + "Duração", entre o nome e o status de disponibilidade. */
@@ -846,6 +848,7 @@ span.card-banner-imagem {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  margin-top: 7px;
   font-size: 16px;
   line-height: 1.3;
   font-weight: 600;
@@ -912,12 +915,14 @@ span.card-banner-imagem {
    não faz parte deste ajuste. Reforça o min-height do bloco (34px base) porque o texto maior
    ocupa mais altura. */
 .card-corpo .preco-referencia-bloco {
-  gap: 5px;
+  gap: 8px;
+  margin-top: 7px;
   margin-bottom: 0;
   min-height: 42px;
 }
 .card-corpo .preco-referencia-valor {
-  font-size: 17px;
+  font-size: 22px;
+  color: #dc2626;
 }
 .card-corpo .preco-referencia-legenda {
   font-size: 17px;
@@ -956,7 +961,8 @@ span.card-banner-imagem {
   min-height: 26px;
 }
 .card-corpo .preco-antigo {
-  font-size: 17px;
+  font-size: 22px;
+  color: #dc2626;
 }
 .card-corpo .etiqueta-desconto {
   font-size: 14px;
@@ -1000,7 +1006,7 @@ span.card-banner-imagem {
   justify-content: center;
 }
 .card-acoes button {
-  padding: 12px 24px;
+  padding: 9px 22px;
 }
 
 .acoes-admin {
