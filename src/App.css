@@ -400,19 +400,27 @@
 
 /* Barra de confiança */
 
+/* Sem linha divisória acima/abaixo (ao contrário das outras seções) -- o padding extra
+   compensa a ausência da linha e mantém a separação do Hero e do "Como funciona" seguinte. */
 .barra-confianca {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 40px 24px 64px;
-  border-top: 1px solid var(--borda);
+  padding: 56px 24px 72px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
+/* Remove a linha do topo da seção seguinte (normalmente presente em .secao) só quando ela vem
+   logo depois da barra de confiança, pra não sobrar divisória embaixo desta seção específica. */
+.barra-confianca + .secao {
+  border-top: none;
+}
+
 .barra-confianca-item {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   font-size: 14px;
   font-weight: 600;
@@ -435,9 +443,15 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* Abaixo de 600px as colunas de 2 ficam estreitas demais pros rótulos maiores (ex: "Garantia
+   de reembolso") caberem numa linha só -- quando o texto quebra, o item flexível ocupa toda a
+   largura restante da coluna (comportamento do flexbox com item que quebra linha) e o
+   justify-content:center deixa de ter efeito visível. Uma coluna só resolve, dando largura de
+   sobra pro texto não quebrar. */
 @media (max-width: 600px) {
   .barra-confianca {
-    padding: 24px 20px 32px;
+    grid-template-columns: 1fr;
+    padding: 32px 20px 40px;
     gap: 14px;
   }
 }
