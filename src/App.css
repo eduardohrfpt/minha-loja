@@ -774,7 +774,7 @@ span.card-banner-imagem {
 .card-corpo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   padding: 20px 22px 24px;
   flex: 1;
   /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
@@ -787,7 +787,7 @@ span.card-banner-imagem {
    que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
    meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si. */
 .card h3 {
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
@@ -826,26 +826,26 @@ span.card-banner-imagem {
 .card-info-rapida {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  font-size: 13px;
+  gap: 18px;
+  font-size: 15px;
   color: var(--texto-suave);
 }
 .card-info-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 .card-info-icone {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
 .disponibilidade {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 7px;
+  font-size: 16px;
   font-weight: 600;
   width: fit-content;
   /* width:fit-content por si só cai no alinhamento padrão (esquerda) dentro do .card-corpo
@@ -855,8 +855,8 @@ span.card-banner-imagem {
   align-self: center;
 }
 .disponibilidade i {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: currentColor;
 }
@@ -910,13 +910,14 @@ span.card-banner-imagem {
    não faz parte deste ajuste. Reforça o min-height do bloco (34px base) porque o texto maior
    ocupa mais altura. */
 .card-corpo .preco-referencia-bloco {
-  min-height: 42px;
+  gap: 3px;
+  min-height: 50px;
 }
 .card-corpo .preco-referencia-valor {
-  font-size: 15px;
+  font-size: 17px;
 }
 .card-corpo .preco-referencia-legenda {
-  font-size: 15px;
+  font-size: 17px;
 }
 
 /* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
@@ -928,7 +929,7 @@ span.card-banner-imagem {
 .precos {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .precos-linha {
@@ -949,13 +950,14 @@ span.card-banner-imagem {
    raciocínio das outras classes de preço acima: maiores só dentro do card do catálogo. */
 .card-corpo .precos-linha {
   justify-content: center;
-  min-height: 26px;
+  gap: 10px;
+  min-height: 30px;
 }
 .card-corpo .preco-antigo {
-  font-size: 15px;
+  font-size: 17px;
 }
 .card-corpo .etiqueta-desconto {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .preco-antigo {
@@ -982,7 +984,7 @@ span.card-banner-imagem {
 /* Preço final maior e mais em destaque, só no card do catálogo -- .preco-final também aparece
    no modal de detalhes, que não faz parte deste ajuste. */
 .card-corpo .preco-final {
-  font-size: 30px;
+  font-size: 34px;
 }
 
 .card-acoes {
