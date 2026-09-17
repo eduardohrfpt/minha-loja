@@ -737,12 +737,11 @@
 }
 
 /* Imagem/ícone do produto como banner no topo do card, ocupando a largura toda (padrão
-   GENIUZ Labs) -- substitui o ícone pequeno que ficava ao lado do nome. Proporção maior que a
-   16:9 original: a altura extra vem do espaço economizado com o gap menor do .card-corpo logo
-   abaixo (era 12px, ver ali), então a altura total do card não muda. */
+   GENIUZ Labs) -- substitui o ícone pequeno que ficava ao lado do nome. 16:9 padrão -- o card
+   fica mais alto proporcionalmente pra acomodar (largura não muda). */
 .card-banner {
   width: 100%;
-  aspect-ratio: 2.43;
+  aspect-ratio: 16 / 9;
   background: var(--bg-alt);
   border-bottom: 1px solid var(--borda);
   display: flex;
