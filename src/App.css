@@ -505,11 +505,20 @@
   }
 }
 
+/* Mesmo estilo do badge "Economize até 70%" do Hero (fundo verde escuro, texto branco,
+   arredondado) -- aqui com padding maior pra acomodar o texto do título, mantendo a
+   proporção com o resto do site. */
 .secao-cabecalho h2 {
+  display: block;
+  width: fit-content;
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  margin-bottom: 12px;
+  color: #fff;
+  background: #047857;
+  padding: 16px 36px;
+  border-radius: var(--raio-sm);
+  margin: 0 auto 20px;
 }
 
 .secao-cabecalho p {
@@ -520,7 +529,8 @@
 
 @media (max-width: 480px) {
   .secao-cabecalho h2 {
-    font-size: 25px;
+    font-size: 22px;
+    padding: 12px 24px;
   }
   .secao-cabecalho p {
     font-size: 14px;
