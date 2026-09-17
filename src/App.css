@@ -454,6 +454,15 @@
     padding: 32px 20px 40px;
     gap: 14px;
   }
+  /* Cada item centralizado individualmente deixava os ícones em posições horizontais
+     diferentes (textos com larguras distintas). Largura fixa (cabe o rótulo mais longo,
+     "Garantia de reembolso") com conteúdo alinhado à esquerda dentro dela, e a caixa toda
+     centralizada na linha via justify-self -- ícones ficam alinhados verticalmente entre si. */
+  .barra-confianca-item {
+    width: 220px;
+    justify-self: center;
+    justify-content: flex-start;
+  }
 }
 
 /* Seções genéricas */
