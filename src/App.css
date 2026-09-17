@@ -159,26 +159,11 @@
 
 /* Hero */
 
-/* Fundo esticado de borda a borda da tela -- só o conteúdo (.hero, abaixo) fica limitado a
-   1180px e centralizado, pra manter o mesmo respiro interno de antes. */
+/* O fundo verde-claro (com o glow radial) agora é do body inteiro (ver index.css) -- a Hero só
+   reserva o espaço pra não ficar embaixo do cabeçalho fixo, sem fundo próprio. */
 .hero-secao {
   position: relative;
-  isolation: isolate;
   padding: 96px 0 56px;
-  background: var(--bg-alt);
-}
-
-/* Glow radial suave nos dois cantos superiores, simétrico -- atrás de todo o conteúdo. z-index
-   negativo + isolation no pai garante que fique atrás do conteúdo. */
-.hero-secao::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(640px circle at 6% 20%, rgba(16, 185, 129, 0.12), transparent 60%),
-    radial-gradient(640px circle at 94% 20%, rgba(16, 185, 129, 0.12), transparent 60%);
-  pointer-events: none;
 }
 
 .hero {
@@ -242,7 +227,7 @@
 
 .hero-card {
   position: relative;
-  background: var(--bg-alt);
+  background: #fff;
   border: 1px solid var(--borda);
   border-radius: var(--raio);
   padding: 24px 20px 20px;

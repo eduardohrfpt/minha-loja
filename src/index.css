@@ -30,8 +30,17 @@
   box-sizing: border-box;
 }
 
+/* Mesmo gradiente verde-claro suave usado antes só na Hero, agora como fundo de todo o site.
+   background-attachment:fixed prende o gradiente à tela (não rola com o conteúdo), por isso
+   fica aqui no body em vez de em cada seção -- garante cobertura contínua da página inteira,
+   inclusive em páginas mais longas ou mais curtas que a viewport. */
 body {
   margin: 0;
+  background:
+    radial-gradient(640px circle at 6% 20%, rgba(16, 185, 129, 0.12), transparent 60%),
+    radial-gradient(640px circle at 94% 20%, rgba(16, 185, 129, 0.12), transparent 60%),
+    var(--bg-alt);
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4 {
