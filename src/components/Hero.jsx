@@ -14,11 +14,11 @@ function Hero({ produtosDestaque }) {
       <div className="hero">
         <div className="hero-texto">
           <span className="banner-destaque" data-reveal>
-            Economize até 90% em assinaturas premium
+            Economize até 70% em assinaturas premium
           </span>
           <h1 data-reveal>As mesmas assinaturas por um preço muito mais baixo.</h1>
           <p className="hero-destaque" data-reveal>
-            Acesso legítimo às plataformas originais, com desconto de até 90%.
+            Acesso legítimo às plataformas originais, com desconto de até 70%.
           </p>
           <p className="hero-subtitulo" data-reveal>
             Compramos em dólar e em grande quantidade, o que garante os melhores preços — e
@@ -36,7 +36,7 @@ function Hero({ produtosDestaque }) {
         </div>
 
         <div className="hero-card" data-reveal>
-          <span className="hero-card-selo">Economize até 90%</span>
+          <span className="hero-card-selo">Economize até 70%</span>
           <div className="hero-card-cabecalho">
             <strong>Seus produtos</strong>
             <span>Entrega em até 10 minutos</span>
