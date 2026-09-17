@@ -16,7 +16,7 @@ function Hero({ produtosDestaque }) {
           <span className="banner-destaque" data-reveal>
             Economize até 90% em assinaturas premium
           </span>
-          <h1 data-reveal>Assinaturas premium por um preço muito mais baixo.</h1>
+          <h1 data-reveal>As mesmas assinaturas por um preço muito mais baixo.</h1>
           <p className="hero-destaque" data-reveal>
             Acesso legítimo às plataformas originais, com desconto de até 90%.
           </p>
