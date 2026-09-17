@@ -505,8 +505,8 @@
   }
 }
 
-/* Mesmo estilo do badge "Economize até 70%" do Hero (fundo verde escuro, texto branco,
-   arredondado) -- aqui com padding maior pra acomodar o texto do título, mantendo a
+/* Destaque leve atrás do título, no estilo original do badge do Hero (fundo verde bem claro,
+   texto verde escuro) -- aqui com padding maior pra acomodar o texto do título, mantendo a
    proporção com o resto do site. */
 .secao-cabecalho h2 {
   display: block;
@@ -514,8 +514,9 @@
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #fff;
-  background: #047857;
+  color: var(--verde-escuro);
+  background: #d1fae5;
+  border: 1px solid rgba(16, 185, 129, 0.35);
   padding: 16px 36px;
   border-radius: var(--raio-sm);
   margin: 0 auto 20px;
