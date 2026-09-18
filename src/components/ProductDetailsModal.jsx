@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { formatarPreco } from '../utils'
-import { IconCheck, IconShield, IconLock, IconHeadset, IconBolt, IconPackage } from './icons'
+import { IconCheck, IconShield, IconLock, IconHeadset, IconBolt, IconPackage, IconChevronDown } from './icons'
 import IconeProduto from './IconeProduto'
 
 const TIPO_ACESSO = 'Na sua própria conta'
@@ -39,6 +40,7 @@ const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
 // modal sumiria na hora em vez de fechar com transição.
 function ConteudoModalProduto({ produto, onFechar, onComprar }) {
   const reduzirMovimento = useReducedMotion()
+  const [maisInfoAberta, setMaisInfoAberta] = useState(false)
 
   // Isto aqui é só uma decisão de UI (esconder um número de estoque que não existiria de
   // verdade pra esses produtos) -- não expõe nem menciona nada sobre o processo de entrega
@@ -186,6 +188,39 @@ function ConteudoModalProduto({ produto, onFechar, onComprar }) {
               </tbody>
             </table>
           </div>
+
+          {/* Texto completo original do produto (campo resumo_final) -- o mesmo conteúdo que
+              deu origem às seções resumidas acima (O que está incluído, Ficha técnica etc.),
+              preservado na íntegra aqui como referência. Fechado por padrão (useState(false)),
+              sem ocupar espaço até o cliente clicar -- só existe quando o produto tem
+              resumo_final preenchido. */}
+          {produto.resumo_final && (
+            <div className="detalhe-bloco">
+              <button
+                type="button"
+                className="detalhe-acordeao-cabecalho"
+                onClick={() => setMaisInfoAberta((aberta) => !aberta)}
+                aria-expanded={maisInfoAberta}
+              >
+                <span>Ver mais informações sobre o produto</span>
+                <IconChevronDown className={`detalhe-acordeao-seta ${maisInfoAberta ? 'aberta' : ''}`} />
+              </button>
+              <AnimatePresence initial={false}>
+                {maisInfoAberta && (
+                  <motion.div
+                    key="mais-info"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: reduzirMovimento ? 0 : 0.25, ease: 'easeInOut' }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <p className="detalhe-texto-livre detalhe-acordeao-texto">{produto.resumo_final}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           <div className="detalhe-bloco">
             <h4>Garantias da compra</h4>

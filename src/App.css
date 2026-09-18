@@ -1400,6 +1400,37 @@ span.card-banner-imagem {
   margin-bottom: 6px;
 }
 
+/* Seção "Ver mais informações sobre o produto" -- acordeão fechado por padrão, mesmo
+   comportamento visual do .faq-pergunta/.faq-seta da seção de dúvidas frequentes. */
+.detalhe-acordeao-cabecalho {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--titulo);
+  cursor: pointer;
+  text-align: left;
+}
+.detalhe-acordeao-seta {
+  width: 16px;
+  height: 16px;
+  color: var(--texto-suave);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.detalhe-acordeao-seta.aberta {
+  transform: rotate(180deg);
+}
+.detalhe-acordeao-texto {
+  margin-top: 10px;
+}
+
 .detalhe-texto-livre {
   font-size: 14px;
   color: var(--texto);

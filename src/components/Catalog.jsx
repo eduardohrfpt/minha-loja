@@ -628,8 +628,19 @@ function Catalog({
               />
             </label>
             <label>
-              Frase resumo final (opcional)
-              <input value={form.resumo_final} onChange={(e) => setForm({ ...form, resumo_final: e.target.value })} placeholder="Ex: A forma mais barata de ter o ChatGPT Plus" />
+              Descrição completa original (opcional) -- texto integral que você mandou antes de
+              resumirmos nos campos acima. Aparece no acordeão "Ver mais informações sobre o
+              produto", fechado por padrão, no modal de Detalhes.
+              <textarea
+                rows={10}
+                value={form.resumo_final}
+                onChange={(e) => setForm({ ...form, resumo_final: e.target.value })}
+                placeholder={
+                  'Cole aqui o texto completo original enviado pra esse produto (benefícios, ' +
+                  'para quem é indicado, compatibilidade, avisos etc.) -- os campos acima ' +
+                  '(O que está incluso, Instruções de ativação...) são o resumo desse texto.'
+                }
+              />
             </label>
             <label>
               Instruções de ativação (passo a passo)
