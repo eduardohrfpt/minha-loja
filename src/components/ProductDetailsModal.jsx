@@ -126,17 +126,6 @@ function ConteudoModalProduto({ produto, onFechar, onComprar }) {
 
           {descricaoCurta && <p className="detalhe-descricao-curta">{descricaoCurta}</p>}
 
-          {/* Texto longo/completo do produto (campo resumo_final) -- diferente de
-              descricaoCurta acima (1 parágrafo curto, cortado em 3 linhas). Sem clamp aqui, e
-              .detalhe-texto-livre já preserva quebra de linha (white-space:pre-line), então
-              títulos e listas digitados com "\n" no texto aparecem formatados. */}
-          {produto.resumo_final && (
-            <div className="detalhe-bloco">
-              <h4>Descrição completa</h4>
-              <p className="detalhe-texto-livre">{produto.resumo_final}</p>
-            </div>
-          )}
-
           {itensIncluidos.length > 0 && (
             <div className="detalhe-bloco">
               <h4>O que está incluído</h4>
@@ -178,7 +167,7 @@ function ConteudoModalProduto({ produto, onFechar, onComprar }) {
                 </tr>
                 <tr>
                   <th>O que você recebe</th>
-                  <td>{O_QUE_RECEBE}</td>
+                  <td>{produto.o_que_recebe || O_QUE_RECEBE}</td>
                 </tr>
                 <tr>
                   <th>Duração</th>
@@ -188,10 +177,12 @@ function ConteudoModalProduto({ produto, onFechar, onComprar }) {
                   <th>Prazo de entrega</th>
                   <td>{PRAZO_ENTREGA_FICHA}</td>
                 </tr>
-                <tr>
-                  <th>Garantia</th>
-                  <td>{GARANTIA_FICHA}</td>
-                </tr>
+                {!produto.ficha_ocultar_garantia && (
+                  <tr>
+                    <th>Garantia</th>
+                    <td>{GARANTIA_FICHA}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

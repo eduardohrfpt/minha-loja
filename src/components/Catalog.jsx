@@ -55,6 +55,8 @@ const formVazio = {
   aviso_prazo: '',
   resumo_final: '',
   instrucoes_ativacao: '',
+  o_que_recebe: '',
+  ficha_ocultar_garantia: false,
 }
 
 function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeholder }) {
@@ -142,6 +144,8 @@ function Catalog({
       aviso_prazo: produto.aviso_prazo || '',
       resumo_final: produto.resumo_final || '',
       instrucoes_ativacao: produto.instrucoes_ativacao || '',
+      o_que_recebe: produto.o_que_recebe || '',
+      ficha_ocultar_garantia: produto.ficha_ocultar_garantia || false,
     })
     setProdutoEditando(produto.id)
   }
@@ -201,6 +205,8 @@ function Catalog({
       aviso_prazo: form.aviso_prazo,
       resumo_final: form.resumo_final,
       instrucoes_ativacao: form.instrucoes_ativacao,
+      o_que_recebe: form.o_que_recebe.trim() || null,
+      ficha_ocultar_garantia: form.ficha_ocultar_garantia,
     }
 
     setSalvando(true)
@@ -633,6 +639,22 @@ function Catalog({
                 onChange={(e) => setForm({ ...form, instrucoes_ativacao: e.target.value })}
                 placeholder={'Um passo por linha, ex:\nAcesse o link recebido\nFaça login com sua conta\nCole o código no campo de ativação'}
               />
+            </label>
+            <label>
+              Ficha técnica -- "O que você recebe" (opcional)
+              <input
+                value={form.o_que_recebe}
+                onChange={(e) => setForm({ ...form, o_que_recebe: e.target.value })}
+                placeholder="Padrão: Código ou link de ativação, para uso na sua própria conta"
+              />
+            </label>
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={form.ficha_ocultar_garantia}
+                onChange={(e) => setForm({ ...form, ficha_ocultar_garantia: e.target.checked })}
+              />
+              Ocultar linha "Garantia" na ficha técnica
             </label>
 
             <div className="acoes-formulario">
