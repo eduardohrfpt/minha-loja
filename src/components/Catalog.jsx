@@ -17,10 +17,10 @@ const HOVER_BOTAO_CARD = { scale: 1.035 }
 const TAP_BOTAO_CARD = { scale: 0.97 }
 const TRANSICAO_BOTAO_CARD = { duration: 0.15, ease: 'easeOut' }
 
-// ATENÇÃO -- texto voltado ao cliente: "Até 10 min" é sempre genérico e igual pra todo
-// produto, igual ao ENTREGA_RESUMO de ProductDetailsModal.jsx -- nunca varia por
-// delivery_type nem detalha o processo real de entrega (ver aviso em ProductDetailsModal.jsx).
-const ENTREGA_RESUMO_CARD = 'Até 10 min'
+// ATENÇÃO -- texto voltado ao cliente: sempre genérico e igual pra todo produto -- nunca varia
+// por delivery_type nem detalha o processo real de entrega (mesmo raciocínio do ENTREGA_RESUMO
+// de ProductDetailsModal.jsx, que mantém a própria redação "Até 10 min" -- ver aviso lá).
+const ENTREGA_RESUMO_CARD = 'Entrega rápida'
 
 // A marca só agrega informação quando NÃO está contida no nome do produto (ex: "Notion Plus"
 // já deixa claro que é da Notion; "Assinatura Anual Premium" com marca "Spotify" não deixa,
@@ -348,74 +348,68 @@ function Catalog({
 
           return (
             <div className="card" key={produto.id} data-reveal>
-              {produto.badges?.length > 0 && (
-                <div className="selos">
-                  {produto.badges.map((badge) => (
-                    <span className="selo" key={badge}>
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="card-topo">
+                <div className="card-diagonal-fundo" aria-hidden="true" />
 
-              {/* Imagem/ícone como banner, ocupando a largura toda no topo do card (padrão
-                  GENIUZ Labs) -- em vez do ícone pequeno ao lado do nome de antes. */}
-              <div className="card-banner">
-                <IconeProduto produto={produto} className="card-banner-imagem" />
+                {produto.badges?.length > 0 && (
+                  <div className="selos">
+                    {produto.badges.map((badge) => (
+                      <span className="selo" key={badge}>
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="card-imagem-flutuante">
+                  <IconeProduto produto={produto} className="card-banner-imagem" />
+                </div>
               </div>
 
               <div className="card-corpo">
                 <h3>{produto.name}</h3>
 
-                {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
-                    card -- ver comentário igual mais abaixo sobre .preco-referencia-bloco.
-                    A marca só aparece quando agrega informação além do nome (ver
+                {/* A marca só aparece quando agrega informação além do nome (ver
                     marcaRedundante acima). */}
-                <div className="card-marca-bloco">
-                  {!marcaRedundante(produto) && <span className="card-marca">{produto.brand}</span>}
-                </div>
+                {!marcaRedundante(produto) && <span className="card-marca">{produto.brand}</span>}
 
-                <div className="card-info-rapida">
-                  <span className="card-info-item">
-                    <IconBolt className="card-info-icone" />
-                    {ENTREGA_RESUMO_CARD}
-                  </span>
-                  {produto.duration && (
+                <div className="card-meta">
+                  <div className="card-info-rapida">
                     <span className="card-info-item">
-                      <IconPackage className="card-info-icone" />
-                      {produto.duration}
+                      <IconBolt className="card-info-icone" />
+                      {ENTREGA_RESUMO_CARD}
                     </span>
-                  )}
-                </div>
-
-                <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
-                  <i />
-                  {statusTexto}
-                </span>
-
-                {/* Sempre renderiza o bloco (mesmo vazio) pra reservar a mesma altura em todo
-                    card -- se só aparecesse quando preco_referencia existisse, os cards sem
-                    preço de referência ficariam com o preço/botões mais pra cima que os
-                    demais, quebrando o alinhamento entre os cards da mesma linha. */}
-                <div className="preco-referencia-bloco">
-                  {produto.preco_referencia > 0 && (
-                    <>
-                      <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
-                      <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
-                    </>
-                  )}
-                </div>
-                <div className="precos">
-                  <div className="precos-linha">
-                    {produto.discount > 0 && (
-                      <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
-                    )}
-                    {produto.discount > 0 && (
-                      <span className="etiqueta-desconto">-{produto.discount}%</span>
+                    {produto.duration && (
+                      <span className="card-info-item">
+                        <IconPackage className="card-info-icone" />
+                        {produto.duration}
+                      </span>
                     )}
                   </div>
-                  <span className="preco-final">{formatarPreco(produto.price)}</span>
+
+                  <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
+                    <i />
+                    {statusTexto}
+                  </span>
                 </div>
+
+                {/* Depois da linha de entrega/status -- totalmente dentro da área branca, sem
+                    sobrepor a imagem (ver .card-imagem-flutuante, que ocupa .card-topo
+                    inteiro). */}
+                <span className="card-preco-selo">{formatarPreco(produto.price)}</span>
+
+                {produto.preco_referencia > 0 && (
+                  <div className="card-economia">
+                    <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+                    <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+                  </div>
+                )}
+                {produto.discount > 0 && (
+                  <div className="card-desconto-linha">
+                    <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+                    <span className="etiqueta-desconto">-{produto.discount}%</span>
+                  </div>
+                )}
 
                 <div className="card-acoes">
                   <motion.button

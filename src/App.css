@@ -679,34 +679,85 @@
   }
 }
 
+/* Card do catálogo: topo colorido com divisão diagonal + foto flutuando + selo circular de
+   preço, corpo branco embaixo com nome, descrição curta, status e CTA em pill. Mesma cor de
+   fundo (verde-tint) em todos os cards -- a "cor por produto" não faz parte deste redesenho. */
 .card {
   position: relative;
-  border: 1px solid var(--borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-lg);
   background: #fff;
   display: flex;
   flex-direction: column;
-  /* Sem padding aqui -- o banner de imagem precisa ocupar a largura toda, encostado nas
-     bordas/cantos do card. O respiro interno do resto do conteúdo vem do .card-corpo. */
   overflow: hidden;
   box-shadow: var(--sombra-suave);
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .card:hover {
   box-shadow: var(--sombra-media);
-  border-color: rgba(15, 43, 70, 0.12);
   transform: translateY(-4px);
 }
 
+/* Faixa colorida do topo -- fundo com divisão diagonal em dois tons de verde-claro (mesma
+   família de cor em todo card, só o ângulo muda visualmente). A foto do produto preenche toda
+   essa área (largura e altura), cobrindo o fundo diagonal -- o fundo só aparece de verdade no
+   fallback sem image_url (emoji, que não estica pra preencher). */
+.card-topo {
+  position: relative;
+  height: 190px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-diagonal-fundo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #eafcf4 0%, #eafcf4 46%, #bfeeda 46%, #bfeeda 100%);
+}
+
+.card-imagem-flutuante {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.card:hover .card-imagem-flutuante img.card-banner-imagem {
+  transform: scale(1.04);
+}
+
+/* <img>, quando o produto tem image_url -- cover (em vez de contain) pra preencher toda a
+   área do topo do card, largura e altura, sem sobra de espaço vazio ao redor. */
+img.card-banner-imagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* <span>, emoji de fallback quando não há image_url -- continua centralizado no tamanho
+   original (esticar um emoji pra cobrir a área toda distorceria o glifo). */
+span.card-banner-imagem {
+  font-size: 64px;
+  line-height: 1;
+}
+
+/* Selos (ex: "Mais vendido") no canto esquerdo do topo. O preço, em destaque, agora é o selo
+   circular centralizado na divisa com o corpo do card (.card-preco-selo, abaixo). */
 .selos {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 6px;
-  max-width: 65%;
+  max-width: 60%;
 }
 
 .selo {
@@ -718,8 +769,38 @@
   border-radius: 999px;
 }
 
-/* Ícone pequeno quadrado -- não é mais usado no card do catálogo (ver .card-banner abaixo),
-   mas continua servindo a lista de "Minhas compras" (MyOrdersModal). */
+/* Selo (retângulo bem arredondado) com o preço final em destaque -- depois do nome, dentro do
+   fluxo normal do .card-corpo (coluna centralizada), totalmente na área branca, sem sobrepor a
+   imagem. align-self:center + largura no conteúdo garantem o selo centralizado e do tamanho do
+   texto, já que os outros filhos do .card-corpo esticam por padrão. margin-top negativo
+   aproxima o selo do nome, puxando um pouco pra cima do espaçamento padrão entre elementos do
+   corpo. Borda branca + sombra forte garantem contraste por cima de qualquer imagem de fundo,
+   inclusive escuras ou muito coloridas. */
+.card-preco-selo {
+  align-self: center;
+  flex-shrink: 0;
+  margin-top: -4px;
+  /* Espaço extra abaixo, além do gap padrão do .card-corpo -- sem isso a linha de
+     entrega/duração (.card-meta) fica colada no selo. */
+  margin-bottom: 12px;
+  white-space: nowrap;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.1;
+  border: 2px solid #fff;
+  box-shadow: 0 16px 28px -6px rgba(15, 43, 70, 0.6), 0 6px 12px -2px rgba(15, 43, 70, 0.45);
+}
+
+/* Ícone pequeno quadrado -- não é mais usado no card do catálogo (ver .card-topo acima), mas
+   continua servindo a lista de "Minhas compras" (MyOrdersModal). */
 .icone-marca {
   display: grid;
   place-items: center;
@@ -736,46 +817,11 @@
   object-fit: cover;
 }
 
-/* Imagem/ícone do produto como banner no topo do card, ocupando a largura toda (padrão
-   GENIUZ Labs) -- substitui o ícone pequeno que ficava ao lado do nome. 16:9 padrão -- o card
-   fica mais alto proporcionalmente pra acomodar (largura não muda). */
-.card-banner {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--borda);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-/* <img>, quando o produto tem image_url -- contain (em vez de cover) pra imagem aparecer
-   inteira, sem cortar nada, seja qual for a proporção original (quadrada, vertical,
-   horizontal). O espaço vazio que sobra nas laterais ou em cima/embaixo mostra o fundo
-   cinza-claro do próprio .card-banner. */
-img.card-banner-imagem {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-.card:hover img.card-banner-imagem {
-  transform: scale(1.05);
-}
-
-/* <span>, emoji de fallback quando não há image_url */
-span.card-banner-imagem {
-  font-size: 72px;
-  line-height: 1;
-}
-
 .card-corpo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 20px 22px 24px;
+  gap: 6px;
+  padding: 16px 20px 20px;
   flex: 1;
   /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
      só ficar com o texto centralizado, e sim o próprio bloco centralizado (o badge de status,
@@ -785,11 +831,9 @@ span.card-banner-imagem {
 
 /* Reserva sempre a altura de 2 linhas pro nome do produto (com "..." se passar disso), pra
    que cards com nomes curtos e longos (ex: "Disney+" vs "Lovable Pro Lite + 300 Créditos (12
-   meses)") tenham o status, o preço e os botões sempre na mesma posição vertical entre si.
-   Reduzido de 3 pra 2 linhas porque, com o nome no dobro do tamanho, 3 linhas não cabiam mais
-   no card sem crescer a altura total -- ver commit que dobrou o font-size do h3. */
+   meses)") tenham o resto do conteúdo sempre na mesma posição vertical entre si. */
 .card h3 {
-  font-size: 33px;
+  font-size: 19px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
@@ -811,25 +855,22 @@ span.card-banner-imagem {
    telas (ProductDetailsModal, MyOrdersModal) com layout próprio, então o ajuste fica escopado
    aqui em vez de ir na classe compartilhada. */
 .card-corpo .card-marca {
-  font-size: 16px;
+  font-size: 13px;
 }
 
-/* Reserva a altura de uma linha de marca mesmo quando ela não aparece (produto com marca
-   redundante ao nome -- ver marcaRedundante em Catalog.jsx) -- sem isso, cards com marca
-   visível ficariam com o resto do conteúdo mais pra baixo que cards sem marca, quebrando o
-   alinhamento entre eles. Também puxa a marca pra mais perto do nome, quando aparece (mesma
-   relação visual "título + subtítulo" de antes). */
-.card-marca-bloco {
-  min-height: 25px;
-  margin-top: -6px;
+/* Linha compacta com "Entrega"/"Duração" de um lado e o status de disponibilidade do outro. */
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
 }
-
-/* Bloco compacto "Entrega" + "Duração", entre o nome e o status de disponibilidade. */
 .card-info-rapida {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  font-size: 13px;
+  gap: 14px;
+  font-size: 12px;
   color: var(--texto-suave);
 }
 .card-info-item {
@@ -838,8 +879,8 @@ span.card-banner-imagem {
   gap: 4px;
 }
 .card-info-icone {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
 }
 
@@ -847,14 +888,9 @@ span.card-banner-imagem {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   width: fit-content;
-  /* width:fit-content por si só cai no alinhamento padrão (esquerda) dentro do .card-corpo
-     centralizado -- sem isso o badge ficaria colado na borda esquerda em vez de centralizado
-     junto com o resto do texto. Só existe no card do catálogo (não é uma classe compartilhada
-     com o modal de detalhes). */
-  align-self: center;
 }
 .disponibilidade i {
   width: 7px;
@@ -907,21 +943,17 @@ span.card-banner-imagem {
   color: var(--verde-escuro);
 }
 
-/* Preço riscado e texto "Você paga bem menos que o preço oficial" maiores e mais em
-   destaque, só no card do catálogo -- essas classes também aparecem no modal de detalhes, que
-   não faz parte deste ajuste. Reforça o min-height do bloco (34px base) porque o texto maior
-   ocupa mais altura. */
-.card-corpo .preco-referencia-bloco {
-  min-height: 42px;
-}
-/* Exceção mantida do ajuste anterior: preço riscado maior e vermelho (não fazia parte da
-   reversão pedida). */
-.card-corpo .preco-referencia-valor {
-  font-size: 22px;
-  color: #dc2626;
-}
-.card-corpo .preco-referencia-legenda {
-  font-size: 15px;
+/* No card do catálogo, o preço final já está em destaque no selo circular do topo -- este
+   bloco só reforça o preço "de tabela" riscado + o motivo de confiança, num chip com fundo
+   verde-tint, usando o mesmo tamanho discreto da classe compartilhada. */
+.card-economia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  background: var(--verde-tint);
+  border-radius: 10px;
 }
 
 /* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
@@ -946,22 +978,13 @@ span.card-banner-imagem {
   min-height: 22px;
 }
 
-/* No card do catálogo, centraliza o preço antigo + etiqueta de desconto como grupo (a linha
-   já ocupa a largura toda; text-align:center não afeta itens flex, por isso o
-   justify-content aqui). Escopado pra não mudar a lista da Hero nem o modal de detalhes, que
-   também usam .precos-linha com seus próprios layouts. */
-/* Também aumenta o min-height e as fontes do preço riscado + etiqueta de desconto, mesmo
-   raciocínio das outras classes de preço acima: maiores só dentro do card do catálogo. */
-.card-corpo .precos-linha {
+/* No card do catálogo, o preço antigo + etiqueta de desconto formam uma linha compacta
+   própria (o preço final já está no selo circular do topo, então não usa .precos-linha). */
+.card-desconto-linha {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  min-height: 26px;
-}
-.card-corpo .preco-antigo {
-  font-size: 22px;
-  color: #dc2626;
-}
-.card-corpo .etiqueta-desconto {
-  font-size: 13px;
+  gap: 8px;
 }
 
 .preco-antigo {
@@ -985,23 +1008,27 @@ span.card-banner-imagem {
   color: var(--titulo);
 }
 
-/* Preço final maior e mais em destaque, só no card do catálogo -- .preco-final também aparece
-   no modal de detalhes, que não faz parte deste ajuste. */
-.card-corpo .preco-final {
-  font-size: 30px;
-}
-
 .card-acoes {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: auto;
-  padding-top: 4px;
+  padding-top: 14px;
   /* Centraliza o par de botões como grupo, em vez de esticar cada um pra metade da largura
      do card. */
   justify-content: center;
 }
-.card-acoes button {
-  padding: 12px 24px;
+/* Botões em pill (bem arredondados), escopados ao card do catálogo -- "Comprar agora" ocupa
+   mais espaço como CTA principal, "Detalhes" fica secundário ao lado. */
+.card-acoes .botao-secundario {
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 13px;
+}
+.card-acoes .botao-primario {
+  flex: 1.4;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 13px;
 }
 
 .acoes-admin {
