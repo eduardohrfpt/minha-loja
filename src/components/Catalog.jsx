@@ -57,6 +57,7 @@ const formVazio = {
   instrucoes_ativacao: '',
   o_que_recebe: '',
   ficha_ocultar_garantia: false,
+  prazo_entrega_ficha: '',
 }
 
 function CampoLista({ label, itens, aoAdicionar, aoAtualizar, aoRemover, placeholder }) {
@@ -146,6 +147,7 @@ function Catalog({
       instrucoes_ativacao: produto.instrucoes_ativacao || '',
       o_que_recebe: produto.o_que_recebe || '',
       ficha_ocultar_garantia: produto.ficha_ocultar_garantia || false,
+      prazo_entrega_ficha: produto.prazo_entrega_ficha || '',
     })
     setProdutoEditando(produto.id)
   }
@@ -207,6 +209,7 @@ function Catalog({
       instrucoes_ativacao: form.instrucoes_ativacao,
       o_que_recebe: form.o_que_recebe.trim() || null,
       ficha_ocultar_garantia: form.ficha_ocultar_garantia,
+      prazo_entrega_ficha: form.prazo_entrega_ficha.trim() || null,
     }
 
     setSalvando(true)
@@ -657,6 +660,14 @@ function Catalog({
                 value={form.o_que_recebe}
                 onChange={(e) => setForm({ ...form, o_que_recebe: e.target.value })}
                 placeholder="Padrão: Código ou link de ativação, para uso na sua própria conta"
+              />
+            </label>
+            <label>
+              Ficha técnica -- "Prazo de entrega" (opcional)
+              <input
+                value={form.prazo_entrega_ficha}
+                onChange={(e) => setForm({ ...form, prazo_entrega_ficha: e.target.value })}
+                placeholder="Padrão: Até 10 minutos após a confirmação do pagamento"
               />
             </label>
             <label className="checkbox">

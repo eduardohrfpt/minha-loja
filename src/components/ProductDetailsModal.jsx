@@ -177,7 +177,7 @@ function ConteudoModalProduto({ produto, onFechar, onComprar }) {
                 </tr>
                 <tr>
                   <th>Prazo de entrega</th>
-                  <td>{PRAZO_ENTREGA_FICHA}</td>
+                  <td>{produto.prazo_entrega_ficha || PRAZO_ENTREGA_FICHA}</td>
                 </tr>
                 {!produto.ficha_ocultar_garantia && (
                   <tr>
