@@ -1139,7 +1139,7 @@ span.card-banner-imagem {
   padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
 }
 
 .detalhe-imagem-grande {
@@ -1398,6 +1398,33 @@ span.card-banner-imagem {
   font-weight: 700;
   color: var(--titulo);
   margin-bottom: 6px;
+}
+
+/* Delimita visualmente cada seção do modal de detalhes do produto (O que está incluído, Como
+   funciona a entrega, Como ativar, Ficha técnica, Ver mais informações, Garantias da compra)
+   com uma borda sutil -- só aqui (.modal-detalhes-completo), sem afetar o .detalhe-bloco de
+   CodigoDetalheModal/PagamentoStatusModal, que usam outro layout. Fundo branco (não
+   var(--bg-alt)) de propósito -- os selos de "Garantias da compra" já usam var(--bg-alt) no
+   próprio chip, e um bloco cinza por trás deles apagaria esse contraste. Mantém
+   títulos/cores como estão, só reforça onde cada bloco começa e termina. */
+.modal-detalhes-completo .detalhe-bloco {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-sm);
+  padding: 16px;
+}
+
+/* Linha divisória sutil antes das caixinhas de Entrega/Duração/Acesso (fim do cabeçalho do
+   produto) e antes do aviso final (fim das seções), pro mesmo efeito de "onde cada bloco
+   começa e termina" nos dois elementos que não usam .detalhe-bloco. */
+.modal-detalhes-completo .detalhe-icones-rapidos {
+  padding-top: 24px;
+  border-top: 1px solid var(--borda);
+}
+
+.modal-detalhes-completo .detalhe-aviso-curto {
+  padding-top: 20px;
+  border-top: 1px solid var(--borda);
 }
 
 /* Seção "Ver mais informações sobre o produto" -- acordeão fechado por padrão, mesmo
