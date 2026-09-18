@@ -774,8 +774,8 @@ span.card-banner-imagem {
 .card-corpo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 2px 22px 2px;
+  gap: 8px;
+  padding: 20px 22px 24px;
   flex: 1;
   /* Centraliza todo o texto do card (nome, marca, status, preços) -- elementos que não devem
      só ficar com o texto centralizado, e sim o próprio bloco centralizado (o badge de status,
@@ -789,7 +789,7 @@ span.card-banner-imagem {
    Reduzido de 3 pra 2 linhas porque, com o nome no dobro do tamanho, 3 linhas não cabiam mais
    no card sem crescer a altura total -- ver commit que dobrou o font-size do h3. */
 .card h3 {
-  font-size: 48px;
+  font-size: 47px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
@@ -820,8 +820,8 @@ span.card-banner-imagem {
    alinhamento entre eles. Também puxa a marca pra mais perto do nome, quando aparece (mesma
    relação visual "título + subtítulo" de antes). */
 .card-marca-bloco {
-  min-height: 0;
-  margin-top: 0;
+  min-height: 25px;
+  margin-top: -6px;
 }
 
 /* Bloco compacto "Entrega" + "Duração", entre o nome e o status de disponibilidade. */
@@ -829,8 +829,7 @@ span.card-banner-imagem {
   display: flex;
   justify-content: center;
   gap: 16px;
-  font-size: 15px;
-  line-height: 1.3;
+  font-size: 13px;
   color: var(--texto-suave);
 }
 .card-info-item {
@@ -848,9 +847,7 @@ span.card-banner-imagem {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 7px;
-  font-size: 16px;
-  line-height: 1.3;
+  font-size: 14px;
   font-weight: 600;
   width: fit-content;
   /* width:fit-content por si só cai no alinhamento padrão (esquerda) dentro do .card-corpo
@@ -915,17 +912,16 @@ span.card-banner-imagem {
    não faz parte deste ajuste. Reforça o min-height do bloco (34px base) porque o texto maior
    ocupa mais altura. */
 .card-corpo .preco-referencia-bloco {
-  gap: 8px;
-  margin-top: 7px;
-  margin-bottom: 0;
   min-height: 42px;
 }
+/* Exceção mantida do ajuste anterior: preço riscado maior e vermelho (não fazia parte da
+   reversão pedida). */
 .card-corpo .preco-referencia-valor {
   font-size: 22px;
   color: #dc2626;
 }
 .card-corpo .preco-referencia-legenda {
-  font-size: 17px;
+  font-size: 15px;
 }
 
 /* No modal de detalhes o bloco de preço é centralizado -- ver .detalhe-preco-linha */
@@ -965,7 +961,7 @@ span.card-banner-imagem {
   color: #dc2626;
 }
 .card-corpo .etiqueta-desconto {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .preco-antigo {
@@ -992,21 +988,20 @@ span.card-banner-imagem {
 /* Preço final maior e mais em destaque, só no card do catálogo -- .preco-final também aparece
    no modal de detalhes, que não faz parte deste ajuste. */
 .card-corpo .preco-final {
-  font-size: 34px;
-  line-height: 1.15;
+  font-size: 30px;
 }
 
 .card-acoes {
   display: flex;
   gap: 10px;
   margin-top: auto;
-  padding-top: 0;
+  padding-top: 4px;
   /* Centraliza o par de botões como grupo, em vez de esticar cada um pra metade da largura
      do card. */
   justify-content: center;
 }
 .card-acoes button {
-  padding: 9px 22px;
+  padding: 12px 24px;
 }
 
 .acoes-admin {
