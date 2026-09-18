@@ -669,7 +669,7 @@
 
 .grade {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 28px;
 }
 
@@ -789,7 +789,7 @@ span.card-banner-imagem {
    Reduzido de 3 pra 2 linhas porque, com o nome no dobro do tamanho, 3 linhas não cabiam mais
    no card sem crescer a altura total -- ver commit que dobrou o font-size do h3. */
 .card h3 {
-  font-size: 47px;
+  font-size: 33px;
   line-height: 1.3;
   margin-bottom: 0;
   display: -webkit-box;
