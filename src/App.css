@@ -455,13 +455,13 @@
 .secao {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 112px 24px;
+  padding: 80px 24px;
   border-top: 1px solid var(--borda);
 }
 
 @media (max-width: 600px) {
   .secao {
-    padding: 56px 20px;
+    padding: 48px 20px;
   }
 }
 
@@ -1801,7 +1801,7 @@ span.card-banner-imagem {
   isolation: isolate;
   overflow: hidden;
   max-width: 1180px;
-  margin: 96px auto;
+  margin: 64px auto;
   border-radius: var(--raio-lg);
   padding: 72px 32px;
   text-align: center;
@@ -1823,7 +1823,7 @@ span.card-banner-imagem {
 
 @media (max-width: 700px) {
   .cta-final {
-    margin: 72px 24px;
+    margin: 56px 24px;
   }
 }
 
