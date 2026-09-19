@@ -18,6 +18,11 @@ function Header() {
   const location = useLocation()
   const navigate = useNavigate()
 
+  // Mesma prioridade nome > e-mail usada antes pro texto do usuário logado -- só a
+  // exibição virou avatar (inicial em maiúscula) em vez do nome/e-mail por extenso.
+  const nomeOuEmailUsuario = usuario?.user_metadata?.nome || usuario?.email || ''
+  const inicialUsuario = nomeOuEmailUsuario.trim().charAt(0).toUpperCase() || '?'
+
   return (
     <header className="cabecalho">
       <div className="cabecalho-conteudo">
@@ -32,7 +37,8 @@ function Header() {
         <nav className="nav-desktop">
           {usuario ? (
             <>
-              <Link to="/catalogo">Catálogo</Link>
+              <Link to="/catalogo">Catálogo de Produtos</Link>
+              <button onClick={() => setMinhasComprasAberto(true)}>Minhas compras</button>
               <Link to="/suporte">Suporte/Ajuda</Link>
             </>
           ) : (
@@ -50,10 +56,10 @@ function Header() {
         <div className="cabecalho-acoes">
           {usuario ? (
             <>
-              <span className="usuario-logado">{usuario.user_metadata?.nome || usuario.email}</span>
-              <button className="botao-fantasma" onClick={() => setMinhasComprasAberto(true)}>
-                Minhas compras
-              </button>
+              <div className="usuario-logado-bloco">
+                <span className="usuario-avatar">{inicialUsuario}</span>
+                <span className="usuario-avatar-legenda">Cliente</span>
+              </div>
               <button className="botao-fantasma" onClick={async () => { await sair(); window.location.href = '/' }}>
                 Sair
               </button>

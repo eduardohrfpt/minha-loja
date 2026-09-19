@@ -1761,10 +1761,32 @@ span.card-banner-imagem {
   margin-top: 4px;
 }
 
-.usuario-logado {
+/* Avatar circular com a inicial do cliente (em vez do nome/e-mail por extenso), com
+   "Cliente" pequeno embaixo -- só no cabeçalho, pra quem está logado. */
+.usuario-logado-bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.usuario-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--azul), var(--verde));
+  color: #fff;
+  font-weight: 700;
   font-size: 14px;
+}
+
+.usuario-avatar-legenda {
+  font-size: 10px;
   font-weight: 600;
-  color: var(--azul);
+  color: var(--texto-suave);
+  line-height: 1;
 }
 
 .acoes-formulario {
