@@ -107,8 +107,6 @@ function Catalog({
   const [pedidosAbertos, setPedidosAbertos] = useState(false)
   const [busca, setBusca] = useState('')
   const carrosselRef = useRef(null)
-  const [setaEsquerdaAtiva, setSetaEsquerdaAtiva] = useState(false)
-  const [setaDireitaAtiva, setSetaDireitaAtiva] = useState(false)
 
   // No mobile o carrossel não usa scroll nativo (ver .grade-carrossel em App.css:
   // overflow-x:hidden bloqueia até o arrasto por toque) -- a navegação é 100% controlada por
@@ -169,22 +167,6 @@ function Catalog({
   const containerRef = useRef(null)
   useScrollReveal(containerRef, [produtosFiltrados])
 
-  // Habilita/desabilita cada seta do carrossel conforme a posição atual do scroll horizontal
-  // -- some com a seta esquerda no início e com a direita no fim, em vez de deixar clicável
-  // sem fazer nada.
-  function atualizarSetasCarrossel() {
-    const el = carrosselRef.current
-    if (!el) return
-    setSetaEsquerdaAtiva(el.scrollLeft > 4)
-    setSetaDireitaAtiva(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
-  }
-
-  useEffect(() => {
-    if (!carrossel) return
-    atualizarSetasCarrossel()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [carrossel, produtosFiltrados])
-
   function rolarCarrossel(direcao) {
     const el = carrosselRef.current
     if (!el) return
@@ -193,12 +175,28 @@ function Catalog({
     // overflow-x:hidden bloqueia inclusive o arrasto por toque). A navegação vira só trocar o
     // índice; quem desloca a trilha de verdade é o efeito acima, via transform. Índice em
     // estado (nunca uma posição de scroll) garante que só existem posições "card inteiro", uma
-    // por vez -- não tem como parar no meio.
+    // por vez -- não tem como parar no meio. Módulo (em vez de clamp) faz o índice dar a volta
+    // pro outro extremo sem nunca travar: a seta funciona sempre, indefinidamente.
     if (carrosselMobile) {
       setIndiceMobile((atual) => {
-        const maximo = Math.max(produtosFiltrados.length - 1, 0)
-        return Math.min(Math.max(atual + direcao, 0), maximo)
+        const total = produtosFiltrados.length
+        if (total <= 0) return 0
+        return (atual + direcao + total) % total
       })
+      return
+    }
+
+    // Desktop: continua rolando de verdade (scrollBy + scroll-behavior:smooth do CSS). Na
+    // ponta (não há mais o que rolar naquela direção) dá a volta pro outro extremo com um
+    // salto instantâneo (behavior:'instant' força isso mesmo com scroll-behavior:smooth no
+    // CSS) -- animar suave a travessia de volta de todos os cards ficaria lento e estranho.
+    const maximoScroll = el.scrollWidth - el.clientWidth
+    if (direcao > 0 && el.scrollLeft >= maximoScroll - 4) {
+      el.scrollTo({ left: 0, behavior: 'instant' })
+      return
+    }
+    if (direcao < 0 && el.scrollLeft <= 4) {
+      el.scrollTo({ left: maximoScroll, behavior: 'instant' })
       return
     }
 
@@ -556,17 +554,12 @@ function Catalog({
             type="button"
             className="grade-carrossel-seta grade-carrossel-seta-esquerda"
             onClick={() => rolarCarrossel(-1)}
-            disabled={carrosselMobile ? indiceMobile <= 0 : !setaEsquerdaAtiva}
             aria-label="Ver produtos anteriores"
           >
             <IconChevronDown />
           </button>
 
-          <div
-            className="grade grade-carrossel"
-            ref={carrosselRef}
-            onScroll={atualizarSetasCarrossel}
-          >
+          <div className="grade grade-carrossel" ref={carrosselRef}>
             <div className="grade-carrossel-trilha" ref={trilhaRef}>
               {cardsRenderizados}
 
@@ -581,7 +574,6 @@ function Catalog({
             type="button"
             className="grade-carrossel-seta grade-carrossel-seta-direita"
             onClick={() => rolarCarrossel(1)}
-            disabled={carrosselMobile ? indiceMobile >= produtosFiltrados.length - 1 : !setaDireitaAtiva}
             aria-label="Ver mais produtos"
           >
             <IconChevronDown />
