@@ -110,11 +110,58 @@ function Catalog({
   const [setaEsquerdaAtiva, setSetaEsquerdaAtiva] = useState(false)
   const [setaDireitaAtiva, setSetaDireitaAtiva] = useState(false)
 
+  // No mobile o carrossel não usa scroll nativo (ver .grade-carrossel em App.css:
+  // overflow-x:hidden bloqueia até o arrasto por toque) -- a navegação é 100% controlada por
+  // este índice, movendo a trilha via transform:translateX() no efeito abaixo. Sem scroll real
+  // não existe posição "intermediária" possível: o índice só assume valores inteiros, então o
+  // resultado é sempre um card inteiro.
+  const trilhaRef = useRef(null)
+  const [indiceMobile, setIndiceMobile] = useState(0)
+  const [carrosselMobile, setCarrosselMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 600px)').matches,
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 600px)')
+    const aoMudar = () => setCarrosselMobile(mq.matches)
+    mq.addEventListener('change', aoMudar)
+    return () => mq.removeEventListener('change', aoMudar)
+  }, [])
+
   const produtosFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase()
     if (!termo) return produtos
     return produtos.filter((produto) => produto.name.toLowerCase().includes(termo))
   }, [produtos, busca])
+
+  // Lista mudou (carregou, filtrou pela busca) -- volta pro primeiro card em vez de manter um
+  // índice que pode não existir mais na lista nova.
+  useEffect(() => {
+    setIndiceMobile(0)
+  }, [produtosFiltrados])
+
+  // Aplica o deslocamento da trilha sempre que o índice muda (clique nas setas) ou a janela
+  // é redimensionada (a largura de "um card" pode mudar). Mede o card já renderizado em vez de
+  // calcular a partir de padding/gap declarados no CSS -- sempre bate exato com o que está na
+  // tela, sem depender de manter os dois números em sincronia manualmente.
+  useEffect(() => {
+    if (!carrossel || !carrosselMobile) return
+    const el = carrosselRef.current
+    const trilha = trilhaRef.current
+    if (!el || !trilha) return
+    const aplicarTransform = () => {
+      const card = el.querySelector('.card')
+      if (!card) {
+        trilha.style.transform = 'translateX(0px)'
+        return
+      }
+      const passo = card.getBoundingClientRect().width + 18
+      trilha.style.transform = `translateX(-${indiceMobile * passo}px)`
+    }
+    aplicarTransform()
+    window.addEventListener('resize', aplicarTransform)
+    return () => window.removeEventListener('resize', aplicarTransform)
+  }, [indiceMobile, carrossel, carrosselMobile, produtosFiltrados])
 
   // Os cards só existem no DOM depois que produtosFiltrados é preenchido (carregamento do
   // Supabase é assíncrono) -- por isso o efeito de scroll reveal depende dele e roda de novo
@@ -141,6 +188,20 @@ function Catalog({
   function rolarCarrossel(direcao) {
     const el = carrosselRef.current
     if (!el) return
+
+    // No mobile não existe scroll nativo pra rolar (ver .grade-carrossel em App.css --
+    // overflow-x:hidden bloqueia inclusive o arrasto por toque). A navegação vira só trocar o
+    // índice; quem desloca a trilha de verdade é o efeito acima, via transform. Índice em
+    // estado (nunca uma posição de scroll) garante que só existem posições "card inteiro", uma
+    // por vez -- não tem como parar no meio.
+    if (carrosselMobile) {
+      setIndiceMobile((atual) => {
+        const maximo = Math.max(produtosFiltrados.length - 1, 0)
+        return Math.min(Math.max(atual + direcao, 0), maximo)
+      })
+      return
+    }
+
     // Rola aproximadamente a largura de um card (+ gap) por clique, na direção pedida. A
     // animação em si vem do scroll-behavior:smooth do CSS (ver .grade-carrossel) -- passar
     // behavior:'smooth' aqui pelo JS não é confiável em alguns navegadores.
@@ -495,7 +556,7 @@ function Catalog({
             type="button"
             className="grade-carrossel-seta grade-carrossel-seta-esquerda"
             onClick={() => rolarCarrossel(-1)}
-            disabled={!setaEsquerdaAtiva}
+            disabled={carrosselMobile ? indiceMobile <= 0 : !setaEsquerdaAtiva}
             aria-label="Ver produtos anteriores"
           >
             <IconChevronDown />
@@ -506,19 +567,21 @@ function Catalog({
             ref={carrosselRef}
             onScroll={atualizarSetasCarrossel}
           >
-            {cardsRenderizados}
+            <div className="grade-carrossel-trilha" ref={trilhaRef}>
+              {cardsRenderizados}
 
-            {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
-            {produtos.length > 0 && produtosFiltrados.length === 0 && (
-              <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
-            )}
+              {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
+              {produtos.length > 0 && produtosFiltrados.length === 0 && (
+                <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
+              )}
+            </div>
           </div>
 
           <button
             type="button"
             className="grade-carrossel-seta grade-carrossel-seta-direita"
             onClick={() => rolarCarrossel(1)}
-            disabled={!setaDireitaAtiva}
+            disabled={carrosselMobile ? indiceMobile >= produtosFiltrados.length - 1 : !setaDireitaAtiva}
             aria-label="Ver mais produtos"
           >
             <IconChevronDown />

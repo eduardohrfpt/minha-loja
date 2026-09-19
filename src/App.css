@@ -436,8 +436,10 @@
 @media (max-width: 600px) {
   .barra-confianca {
     grid-template-columns: 1fr;
-    padding: 32px 20px 40px;
-    gap: 14px;
+    /* Padding vertical bem menor que o do desktop -- o espaço tirado daqui vai pro gap
+       abaixo, redistribuído entre os itens em vez de sobrar vazio só nas bordas da seção. */
+    padding: 16px 20px 20px;
+    gap: 64px;
   }
   /* Cada item centralizado individualmente deixava os ícones em posições horizontais
      diferentes (textos com larguras distintas). Largura fixa (cabe o rótulo mais longo,
@@ -447,6 +449,11 @@
     width: 220px;
     justify-self: center;
     justify-content: flex-start;
+  }
+  .icone-confianca {
+    width: 34px;
+    height: 34px;
+    padding: 7px;
   }
 }
 
@@ -689,9 +696,11 @@
   gap: 12px;
 }
 
+/* A "janela" que recorta o carrossel -- ela quem rola/clipa, nunca quem se move. No desktop
+   rola de verdade (overflow-x:auto, arrasto por trackpad/scrollbar funciona); no mobile vira
+   overflow-x:hidden (ver media query abaixo) e quem se move é a .grade-carrossel-trilha lá
+   dentro, via transform. */
 .grade-carrossel {
-  display: flex;
-  flex-wrap: nowrap;
   overflow-x: auto;
   /* Anima a rolagem via CSS (em vez de scrollBy({behavior:'smooth'}) no JS) -- mais
      confiável entre navegadores pra rolagem disparada por clique nas setas. Sem
@@ -708,10 +717,24 @@
   display: none;
 }
 
-/* .grade já define display:grid acima -- sobrescreve pra flex só quando as duas classes
-   estão juntas (carrossel), sem afetar o .grade sozinho usado em /catalogo. */
+/* .grade já define display:grid acima -- sobrescreve pra bloco (a .grade-carrossel-trilha
+   dentro dela é quem vira flex/gap agora) só quando as duas classes estão juntas (carrossel),
+   sem afetar o .grade sozinho usado em /catalogo. */
 .grade.grade-carrossel {
+  display: block;
+}
+
+/* Trilha com os cards -- sempre um elemento "de verdade" (nunca display:contents: elementos
+   assim não aceitam transform em alguns navegadores, o que já quebrou a rolagem mobile por
+   JS numa tentativa anterior). No desktop ela só reproduz o comportamento antigo (fileira
+   flex mais larga que a janela, rolada nativamente); no mobile ela quem desliza via
+   transform:translateX(), calculado em Catalog.jsx. width:100% -- tanto no desktop quanto no
+   mobile -- é o que dá pros cards (via flex-basis em %, logo abaixo) uma largura de container
+   definida e previsível, sem depender do tamanho do conteúdo. */
+.grade-carrossel-trilha {
   display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
   gap: 28px;
 }
 
@@ -730,8 +753,19 @@
 }
 
 @media (max-width: 600px) {
+  /* No mobile o carrossel não usa scroll nativo de jeito nenhum -- overflow-x:hidden bloqueia
+     inclusive o arrasto por toque, sem exceção (scrollLeft/scrollBy via JS também ficam sem
+     efeito nesse elemento, mas isso não importa mais: a navegação passa a mexer só na
+     .grade-carrossel-trilha via transform, nunca no scroll de .grade-carrossel). Como não
+     existe scroll de verdade, não existe posição "no meio de dois cards" possível: o índice
+     controlado em estado (Catalog.jsx) só assume valores inteiros, sempre landing num card
+     inteiro. */
   .grade.grade-carrossel {
+    overflow-x: hidden;
+  }
+  .grade-carrossel-trilha {
     gap: 18px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .grade-carrossel .card {
     flex-basis: 100%;
@@ -2736,5 +2770,31 @@ span.card-banner-imagem {
 @media (max-width: 640px) {
   .pagina-politicas {
     padding-top: 116px;
+  }
+}
+
+/* Em telas de celular, o padding generoso desses modais (pensado pra desktop) sobra demais
+   ao lado do overlay -- reduz o respiro interno sem mudar largura máxima nem conteúdo. Fica
+   no fim do arquivo de propósito: precisa vir depois da definição-base de cada seletor (mesma
+   especificidade) pra realmente sobrescrever o padding, já que régua de mídia sozinha não
+   ganha de uma regra posterior no arquivo com a mesma especificidade. */
+@media (max-width: 480px) {
+  .overlay {
+    padding: 12px;
+  }
+  .formulario,
+  .modal-estoque,
+  .modal-pedidos {
+    padding: 20px;
+  }
+  .detalhe-scroll {
+    padding: 20px;
+    gap: 20px;
+  }
+  .detalhe-rodape {
+    padding: 14px 20px;
+  }
+  .modal-status-pagamento {
+    padding: 28px 22px;
   }
 }
