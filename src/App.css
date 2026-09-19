@@ -715,8 +715,18 @@
   gap: 28px;
 }
 
+/* Largura do card em % do container (em vez de px fixo) -- garante um número exato de
+   cards inteiros visíveis por vez, sem nenhum cortado na borda, em qualquer largura de
+   tela dentro de cada faixa abaixo (3 cards no desktop, 2 no tablet, 1 no mobile). O
+   cálculo desconta os gaps entre os cards visíveis da largura total. */
 .grade-carrossel .card {
-  flex: 0 0 260px;
+  flex: 0 0 calc((100% - 56px) / 3);
+}
+
+@media (max-width: 900px) {
+  .grade-carrossel .card {
+    flex-basis: calc((100% - 28px) / 2);
+  }
 }
 
 @media (max-width: 600px) {
@@ -724,7 +734,7 @@
     gap: 18px;
   }
   .grade-carrossel .card {
-    flex-basis: 220px;
+    flex-basis: 100%;
   }
 }
 
