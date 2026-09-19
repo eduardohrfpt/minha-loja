@@ -763,9 +763,12 @@
   .grade.grade-carrossel {
     overflow-x: hidden;
   }
+  /* Sem transition de propósito -- com ela, cliques rápidos nas setas (ou navegadores/
+     dispositivos mais lentos) podiam deixar o carrossel visualmente "preso" no meio da
+     animação por um instante, entre um card e outro. Sem transition o transform aplica na
+     hora: nunca existe um frame intermediário pra mostrar. */
   .grade-carrossel-trilha {
     gap: 18px;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .grade-carrossel .card {
     flex-basis: 100%;
