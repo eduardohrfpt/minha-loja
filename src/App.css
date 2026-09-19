@@ -1789,6 +1789,12 @@ span.card-banner-imagem {
   line-height: 1;
 }
 
+.usuario-nome-completo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul);
+}
+
 .acoes-formulario {
   display: flex;
   justify-content: flex-end;

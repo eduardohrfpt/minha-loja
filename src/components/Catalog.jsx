@@ -452,7 +452,7 @@ function Catalog({
   return (
     <section id="produtos" className="secao" ref={containerRef}>
       <div className="secao-cabecalho" data-reveal>
-        <h2>Catálogo</h2>
+        <h2>Catálogo de Produtos</h2>
         <p>Todas as assinaturas disponíveis, com desconto já aplicado.</p>
       </div>
 

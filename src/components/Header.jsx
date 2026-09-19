@@ -60,6 +60,7 @@ function Header() {
                 <span className="usuario-avatar">{inicialUsuario}</span>
                 <span className="usuario-avatar-legenda">Cliente</span>
               </div>
+              <span className="usuario-nome-completo">{nomeOuEmailUsuario}</span>
               <button className="botao-fantasma" onClick={async () => { await sair(); window.location.href = '/' }}>
                 Sair
               </button>
