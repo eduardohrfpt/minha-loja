@@ -679,6 +679,101 @@
   }
 }
 
+/* Carrossel horizontal dos produtos em destaque na página inicial (visitante não logado) --
+   só entra quando o Catalog recebe o prop `carrossel`; o catálogo completo em /catalogo
+   continua sempre com a grade normal (várias linhas), sem overflow horizontal. */
+.grade-carrossel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grade-carrossel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  /* Anima a rolagem via CSS (em vez de scrollBy({behavior:'smooth'}) no JS) -- mais
+     confiável entre navegadores pra rolagem disparada por clique nas setas. Sem
+     scroll-snap de propósito: interfere com scroll acionado por JS em alguns navegadores. */
+  scroll-behavior: smooth;
+  /* Respiro em cima/embaixo pra não cortar o leve "levantar" do card e a sombra dele no
+     hover -- overflow-x:auto sozinho já faz o overflow-y computar como auto (clipping). */
+  padding: 10px 2px 18px;
+  /* Esconde a barra de scroll nativa -- a navegação principal é pelas setas, o arrasto/
+     scroll por trackpad continua funcionando por baixo normalmente. */
+  scrollbar-width: none;
+}
+.grade-carrossel::-webkit-scrollbar {
+  display: none;
+}
+
+/* .grade já define display:grid acima -- sobrescreve pra flex só quando as duas classes
+   estão juntas (carrossel), sem afetar o .grade sozinho usado em /catalogo. */
+.grade.grade-carrossel {
+  display: flex;
+  gap: 28px;
+}
+
+.grade-carrossel .card {
+  flex: 0 0 260px;
+}
+
+@media (max-width: 600px) {
+  .grade.grade-carrossel {
+    gap: 18px;
+  }
+  .grade-carrossel .card {
+    flex-basis: 220px;
+  }
+}
+
+.grade-carrossel-seta {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--borda);
+  background: #fff;
+  color: var(--azul);
+  cursor: pointer;
+  box-shadow: var(--sombra-suave);
+  transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+.grade-carrossel-seta:hover:not(:disabled) {
+  box-shadow: var(--sombra-media);
+  transform: translateY(-1px);
+}
+.grade-carrossel-seta:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.grade-carrossel-seta svg {
+  width: 20px;
+  height: 20px;
+}
+.grade-carrossel-seta-esquerda svg {
+  transform: rotate(90deg);
+}
+.grade-carrossel-seta-direita svg {
+  transform: rotate(-90deg);
+}
+
+@media (max-width: 600px) {
+  .grade-carrossel-seta {
+    width: 36px;
+    height: 36px;
+  }
+  .grade-carrossel-seta svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 /* Card do catálogo: topo colorido com divisão diagonal + foto flutuando + selo circular de
    preço, corpo branco embaixo com nome, descrição curta, status e CTA em pill. Mesma cor de
    fundo (verde-tint) em todos os cards -- a "cor por produto" não faz parte deste redesenho. */

@@ -31,7 +31,7 @@ function PaginaInicial(propsCatalogo) {
       <Hero produtosDestaque={propsCatalogo.produtos.slice(0, 4)} />
       <TrustBar />
       <HowItWorks />
-      <Catalog {...propsCatalogo} />
+      <Catalog {...propsCatalogo} carrossel />
       <WhyBuy />
       <Faq />
       <CtaFinal />

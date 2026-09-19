@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
@@ -7,7 +7,7 @@ import ProductDetailsModal from './ProductDetailsModal'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
-import { IconSearch, IconShield, IconBolt, IconPackage } from './icons'
+import { IconSearch, IconShield, IconBolt, IconPackage, IconChevronDown } from './icons'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 // Sutil, e não atrapalha cliques rápidos: whileHover/whileTap são só transform (escala), não
@@ -89,6 +89,10 @@ function Catalog({
   lojaAberta = true,
   mensagemLojaFechada,
   recarregarConfiguracaoLoja,
+  // Só true na página inicial (visitante não logado) -- troca a grade normal (várias linhas)
+  // por um carrossel horizontal de uma linha só, com setas. O catálogo completo em /catalogo
+  // (usuários logados) sempre usa a grade, independente deste prop.
+  carrossel = false,
 }) {
   const { usuario, isAdmin } = useAuth()
   const adminAtivo = modoAdmin && isAdmin
@@ -102,6 +106,9 @@ function Catalog({
   const [produtoConfirmando, setProdutoConfirmando] = useState(null)
   const [pedidosAbertos, setPedidosAbertos] = useState(false)
   const [busca, setBusca] = useState('')
+  const carrosselRef = useRef(null)
+  const [setaEsquerdaAtiva, setSetaEsquerdaAtiva] = useState(false)
+  const [setaDireitaAtiva, setSetaDireitaAtiva] = useState(false)
 
   const produtosFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase()
@@ -114,6 +121,33 @@ function Catalog({
   // sempre que a lista muda (carrega, filtra pela busca etc.).
   const containerRef = useRef(null)
   useScrollReveal(containerRef, [produtosFiltrados])
+
+  // Habilita/desabilita cada seta do carrossel conforme a posição atual do scroll horizontal
+  // -- some com a seta esquerda no início e com a direita no fim, em vez de deixar clicável
+  // sem fazer nada.
+  function atualizarSetasCarrossel() {
+    const el = carrosselRef.current
+    if (!el) return
+    setSetaEsquerdaAtiva(el.scrollLeft > 4)
+    setSetaDireitaAtiva(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+  }
+
+  useEffect(() => {
+    if (!carrossel) return
+    atualizarSetasCarrossel()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carrossel, produtosFiltrados])
+
+  function rolarCarrossel(direcao) {
+    const el = carrosselRef.current
+    if (!el) return
+    // Rola aproximadamente a largura de um card (+ gap) por clique, na direção pedida. A
+    // animação em si vem do scroll-behavior:smooth do CSS (ver .grade-carrossel) -- passar
+    // behavior:'smooth' aqui pelo JS não é confiável em alguns navegadores.
+    const primeiroCard = el.querySelector('.card')
+    const distancia = primeiroCard ? primeiroCard.getBoundingClientRect().width + 28 : el.clientWidth * 0.8
+    el.scrollBy({ left: direcao * distancia })
+  }
 
   function abrirFormularioNovo() {
     if (!adminAtivo) return
@@ -293,6 +327,128 @@ function Catalog({
     }
   }
 
+  const cardsRenderizados = produtosFiltrados.map((produto) => {
+    // Só produtos de entrega imediata dependem do estoque de codigos_produto -- entrega
+    // manual (ver api/mercadopago-webhook.js) não consome nem checa esse estoque, então
+    // não faz sentido marcar como "Esgotado" um produto assim só por não ter códigos
+    // pré-cadastrados.
+    const usaEstoqueDeCodigos = produto.delivery_type !== 'manual'
+    const qtdEstoque = estoque[produto.id] || 0
+    const semEstoque = usaEstoqueDeCodigos && qtdEstoque === 0
+    const disponivelReal = produto.available && !semEstoque
+    // Produto de código fixo (imediata) com estoque real: mostra a contagem, em
+    // linguagem simples ("3 unidades disponíveis"), em vez de um badge genérico -- ajuda
+    // o cliente a decidir na hora. Entrega manual não tem uma contagem real pra mostrar
+    // (ver comentário acima), então continua só "Disponível".
+    const statusTexto = semEstoque
+      ? 'Esgotado'
+      : !produto.available
+        ? 'Indisponível'
+        : usaEstoqueDeCodigos
+          ? `${qtdEstoque} ${qtdEstoque === 1 ? 'unidade disponível' : 'unidades disponíveis'}`
+          : 'Disponível'
+
+    return (
+      <div className="card" key={produto.id} data-reveal>
+        <div className="card-topo">
+          <div className="card-diagonal-fundo" aria-hidden="true" />
+
+          {produto.badges?.length > 0 && (
+            <div className="selos">
+              {produto.badges.map((badge) => (
+                <span className="selo" key={badge}>
+                  {badge}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="card-imagem-flutuante">
+            <IconeProduto produto={produto} className="card-banner-imagem" />
+          </div>
+        </div>
+
+        <div className="card-corpo">
+          <h3>{produto.name}</h3>
+
+          {/* A marca só aparece quando agrega informação além do nome (ver
+              marcaRedundante acima). */}
+          {!marcaRedundante(produto) && <span className="card-marca">{produto.brand}</span>}
+
+          <div className="card-meta">
+            <div className="card-info-rapida">
+              <span className="card-info-item">
+                <IconBolt className="card-info-icone" />
+                {ENTREGA_RESUMO_CARD}
+              </span>
+              {produto.duration && (
+                <span className="card-info-item">
+                  <IconPackage className="card-info-icone" />
+                  {produto.duration}
+                </span>
+              )}
+            </div>
+
+            <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
+              <i />
+              {statusTexto}
+            </span>
+          </div>
+
+          {/* Depois da linha de entrega/status -- totalmente dentro da área branca, sem
+              sobrepor a imagem (ver .card-imagem-flutuante, que ocupa .card-topo
+              inteiro). */}
+          <span className="card-preco-selo">{formatarPreco(produto.price)}</span>
+
+          {produto.preco_referencia > 0 && (
+            <div className="card-economia">
+              <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
+              <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
+            </div>
+          )}
+          {produto.discount > 0 && (
+            <div className="card-desconto-linha">
+              <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
+              <span className="etiqueta-desconto">-{produto.discount}%</span>
+            </div>
+          )}
+
+          <div className="card-acoes">
+            <motion.button
+              className="botao-secundario"
+              whileHover={HOVER_BOTAO_CARD}
+              whileTap={TAP_BOTAO_CARD}
+              transition={TRANSICAO_BOTAO_CARD}
+              onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
+            >
+              Detalhes
+            </motion.button>
+            <motion.button
+              className="botao-primario"
+              whileHover={HOVER_BOTAO_CARD}
+              whileTap={TAP_BOTAO_CARD}
+              transition={TRANSICAO_BOTAO_CARD}
+              disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
+              onClick={() => comprarAgora(produto)}
+            >
+              {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
+            </motion.button>
+          </div>
+
+          {adminAtivo && (
+            <div className="acoes-admin">
+              <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
+              <button onClick={() => setProdutoEstoque(produto)}>Estoque de códigos</button>
+              <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
+                Remover
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  })
+
   return (
     <section id="produtos" className="secao" ref={containerRef}>
       <div className="secao-cabecalho" data-reveal>
@@ -333,134 +489,51 @@ function Catalog({
         <PedidosModal produtos={produtos} estoque={estoque} onFechar={() => setPedidosAbertos(false)} />
       )}
 
-      <div className="grade">
-        {produtosFiltrados.map((produto) => {
-          // Só produtos de entrega imediata dependem do estoque de codigos_produto -- entrega
-          // manual (ver api/mercadopago-webhook.js) não consome nem checa esse estoque, então
-          // não faz sentido marcar como "Esgotado" um produto assim só por não ter códigos
-          // pré-cadastrados.
-          const usaEstoqueDeCodigos = produto.delivery_type !== 'manual'
-          const qtdEstoque = estoque[produto.id] || 0
-          const semEstoque = usaEstoqueDeCodigos && qtdEstoque === 0
-          const disponivelReal = produto.available && !semEstoque
-          // Produto de código fixo (imediata) com estoque real: mostra a contagem, em
-          // linguagem simples ("3 unidades disponíveis"), em vez de um badge genérico -- ajuda
-          // o cliente a decidir na hora. Entrega manual não tem uma contagem real pra mostrar
-          // (ver comentário acima), então continua só "Disponível".
-          const statusTexto = semEstoque
-            ? 'Esgotado'
-            : !produto.available
-              ? 'Indisponível'
-              : usaEstoqueDeCodigos
-                ? `${qtdEstoque} ${qtdEstoque === 1 ? 'unidade disponível' : 'unidades disponíveis'}`
-                : 'Disponível'
+      {carrossel ? (
+        <div className="grade-carrossel-wrapper">
+          <button
+            type="button"
+            className="grade-carrossel-seta grade-carrossel-seta-esquerda"
+            onClick={() => rolarCarrossel(-1)}
+            disabled={!setaEsquerdaAtiva}
+            aria-label="Ver produtos anteriores"
+          >
+            <IconChevronDown />
+          </button>
 
-          return (
-            <div className="card" key={produto.id} data-reveal>
-              <div className="card-topo">
-                <div className="card-diagonal-fundo" aria-hidden="true" />
+          <div
+            className="grade grade-carrossel"
+            ref={carrosselRef}
+            onScroll={atualizarSetasCarrossel}
+          >
+            {cardsRenderizados}
 
-                {produto.badges?.length > 0 && (
-                  <div className="selos">
-                    {produto.badges.map((badge) => (
-                      <span className="selo" key={badge}>
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                )}
+            {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
+            {produtos.length > 0 && produtosFiltrados.length === 0 && (
+              <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
+            )}
+          </div>
 
-                <div className="card-imagem-flutuante">
-                  <IconeProduto produto={produto} className="card-banner-imagem" />
-                </div>
-              </div>
+          <button
+            type="button"
+            className="grade-carrossel-seta grade-carrossel-seta-direita"
+            onClick={() => rolarCarrossel(1)}
+            disabled={!setaDireitaAtiva}
+            aria-label="Ver mais produtos"
+          >
+            <IconChevronDown />
+          </button>
+        </div>
+      ) : (
+        <div className="grade">
+          {cardsRenderizados}
 
-              <div className="card-corpo">
-                <h3>{produto.name}</h3>
-
-                {/* A marca só aparece quando agrega informação além do nome (ver
-                    marcaRedundante acima). */}
-                {!marcaRedundante(produto) && <span className="card-marca">{produto.brand}</span>}
-
-                <div className="card-meta">
-                  <div className="card-info-rapida">
-                    <span className="card-info-item">
-                      <IconBolt className="card-info-icone" />
-                      {ENTREGA_RESUMO_CARD}
-                    </span>
-                    {produto.duration && (
-                      <span className="card-info-item">
-                        <IconPackage className="card-info-icone" />
-                        {produto.duration}
-                      </span>
-                    )}
-                  </div>
-
-                  <span className={`disponibilidade ${disponivelReal ? 'ok' : 'indisponivel'}`}>
-                    <i />
-                    {statusTexto}
-                  </span>
-                </div>
-
-                {/* Depois da linha de entrega/status -- totalmente dentro da área branca, sem
-                    sobrepor a imagem (ver .card-imagem-flutuante, que ocupa .card-topo
-                    inteiro). */}
-                <span className="card-preco-selo">{formatarPreco(produto.price)}</span>
-
-                {produto.preco_referencia > 0 && (
-                  <div className="card-economia">
-                    <span className="preco-referencia-valor">{formatarPreco(produto.preco_referencia)}</span>
-                    <span className="preco-referencia-legenda">Você paga bem menos que o preço oficial</span>
-                  </div>
-                )}
-                {produto.discount > 0 && (
-                  <div className="card-desconto-linha">
-                    <span className="preco-antigo">{formatarPreco(produto.original_price)}</span>
-                    <span className="etiqueta-desconto">-{produto.discount}%</span>
-                  </div>
-                )}
-
-                <div className="card-acoes">
-                  <motion.button
-                    className="botao-secundario"
-                    whileHover={HOVER_BOTAO_CARD}
-                    whileTap={TAP_BOTAO_CARD}
-                    transition={TRANSICAO_BOTAO_CARD}
-                    onClick={() => setProdutoDetalhe({ ...produto, disponivelReal, estoqueReal: qtdEstoque })}
-                  >
-                    Detalhes
-                  </motion.button>
-                  <motion.button
-                    className="botao-primario"
-                    whileHover={HOVER_BOTAO_CARD}
-                    whileTap={TAP_BOTAO_CARD}
-                    transition={TRANSICAO_BOTAO_CARD}
-                    disabled={!disponivelReal || comprando === produto.id || !lojaAberta}
-                    onClick={() => comprarAgora(produto)}
-                  >
-                    {comprando === produto.id ? 'Redirecionando...' : lojaAberta ? 'Comprar agora' : 'Loja fechada'}
-                  </motion.button>
-                </div>
-
-                {adminAtivo && (
-                  <div className="acoes-admin">
-                    <button onClick={() => abrirFormularioEdicao(produto)}>Editar</button>
-                    <button onClick={() => setProdutoEstoque(produto)}>Estoque de códigos</button>
-                    <button className="botao-remover" onClick={() => removerProduto(produto.id)}>
-                      Remover
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
-
-        {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
-        {produtos.length > 0 && produtosFiltrados.length === 0 && (
-          <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
-        )}
-      </div>
+          {produtos.length === 0 && <p className="vazio">Nenhum produto cadastrado.</p>}
+          {produtos.length > 0 && produtosFiltrados.length === 0 && (
+            <p className="vazio">Nenhum produto encontrado para "{busca}".</p>
+          )}
+        </div>
+      )}
 
       <ProductDetailsModal
         produto={produtoDetalhe}
