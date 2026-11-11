@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { formatarPreco } from '../utils'
+import { rastrearViewContent } from '../lib/metaPixel'
 import { IconCheck, IconShield, IconLock, IconHeadset, IconBolt, IconPackage, IconChevronDown } from './icons'
 import IconeProduto from './IconeProduto'
 
@@ -41,6 +42,12 @@ const PRAZO_ENTREGA_FICHA = 'Até 10 minutos após a confirmação do pagamento'
 function ConteudoModalProduto({ produto, onFechar, onComprar }) {
   const reduzirMovimento = useReducedMotion()
   const [maisInfoAberta, setMaisInfoAberta] = useState(false)
+
+  // Este componente só existe enquanto o modal está aberto, então dispara 1x por produto aberto.
+  // No StrictMode (só em desenvolvimento) o effect roda duas vezes; em produção, uma só.
+  useEffect(() => {
+    rastrearViewContent(produto)
+  }, [produto.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Isto aqui é só uma decisão de UI (esconder um número de estoque que não existiria de
   // verdade pra esses produtos) -- não expõe nem menciona nada sobre o processo de entrega

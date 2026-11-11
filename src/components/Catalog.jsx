@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import { formatarPreco } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import ProductDetailsModal from './ProductDetailsModal'
+import { rastrearInitiateCheckout } from '../lib/metaPixel'
 import GerenciarEstoqueModal from './GerenciarEstoqueModal'
 import PedidosModal from './PedidosModal'
 import IconeProduto from './IconeProduto'
@@ -359,6 +360,7 @@ function Catalog({
     const produto = produtoConfirmando
     setProdutoConfirmando(null)
     setComprando(produto.id)
+    rastrearInitiateCheckout(produto)
 
     try {
       const { data: sessionData } = await supabase.auth.getSession()
